@@ -10,6 +10,8 @@
     <string name="could_not_open_camera">Could not open camera</string>
     <string name="could_not_capture">Could not capture new image</string>
     <string name="please_capture_image">Please capture an image</string>
+    <string name="external_storage_not_writable">External storage not writable</string>
+    <string name="failed_directory_creation">Failed to create images folder</string>
 
     <string name="enter_lot_id">Enter Lot ID</string>
     <string name="enter_sample_id">Enter Sample ID</string>
