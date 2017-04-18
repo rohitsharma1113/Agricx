@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Agricx Image Capture</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="capture_image">Capture New\nImage</string>
+    <string name="lot_id">Lot ID</string>
+    <string name="sample_id">Sample ID</string>
+    <string name="image_id">Image ID</string>
+    <string name="save_and_next">Save and Next</string>
+    <string name="could_not_open_camera">Could not open camera</string>
+    <string name="could_not_capture">Could not capture new image</string>
+    <string name="please_capture_image">Please capture an image</string>
+
+    <string name="enter_lot_id">Enter Lot ID</string>
+    <string name="enter_sample_id">Enter Sample ID</string>
+    <string name="enter_image_id">Enter Image ID</string>
+</resources>

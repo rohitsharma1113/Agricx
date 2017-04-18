@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.agricx.app.agricximagecapture.ui.CaptureActivity"
+    tools:showIn="@layout/activity_capture">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="@dimen/medium_padding">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/image_height">
+
+            <ImageView
+                android:id="@+id/act_capture_iv_preview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:elevation="2dp"
+                android:scaleType="fitCenter"
+                android:layout_gravity="center"
+                tools:src="@color/colorAccent"/>
+
+            <Button
+                android:id="@+id/act_capture_b_camera"
+                style="@style/Button.Neutral"
+                android:layout_width="@dimen/capture_button_width"
+                android:layout_height="@dimen/capture_button_height"
+                android:layout_gravity="center"
+                android:textAllCaps="false"
+                android:paddingTop="@dimen/capture_button_padding"
+                android:drawableTop="@drawable/camera"
+                android:text="@string/capture_image"/>
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/medium_margin">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.85">
+
+                <EditText
+                    android:id="@+id/act_capture_et_lot_id"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/lot_id"
+                    android:inputType="number"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <ImageButton
+                android:id="@+id/act_capture_b_minus_lot_id"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.15"
+                android:background="@android:color/transparent"
+                android:src="@drawable/subtract"/>
+
+            <ImageButton
+                android:id="@+id/act_capture_b_plus_lot_id"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.15"
+                android:background="@android:color/transparent"
+                android:src="@drawable/add"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/very_small_margin">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.85">
+
+                <EditText
+                    android:id="@+id/act_capture_et_sample_id"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/sample_id"
+                    android:inputType="number"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <ImageButton
+                android:id="@+id/act_capture_b_minus_sample_id"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.15"
+                android:background="@android:color/transparent"
+                android:src="@drawable/subtract"/>
+
+            <ImageButton
+                android:id="@+id/act_capture_b_plus_sample_id"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.15"
+                android:background="@android:color/transparent"
+                android:src="@drawable/add"/>
+
+        </LinearLayout>
+
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/very_small_margin">
+
+            <EditText
+                android:id="@+id/act_capture_et_image_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/image_id"
+                android:inputType="number"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <Button
+            android:id="@+id/act_capture_b_save_next"
+            style="@style/Button.Positive"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/medium_to_large_margin"
+            android:textStyle="bold"
+            android:background="@drawable/shape_button"
+            android:text="@string/save_and_next"/>
+
+    </LinearLayout>
+
+</ScrollView>
