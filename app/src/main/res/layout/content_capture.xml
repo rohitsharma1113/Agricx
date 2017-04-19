@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.agricx.app.agricximagecapture.ui.CaptureActivity"
+    tools:context="com.agricx.app.agricximagecapture.ui.activity.CaptureActivity"
     tools:showIn="@layout/activity_capture">
 
     <FrameLayout
@@ -28,6 +28,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:elevation="2dp"
+                    android:clickable="true"
                     android:scaleType="fitCenter"
                     android:layout_gravity="center"
                     tools:src="@color/colorAccent"/>

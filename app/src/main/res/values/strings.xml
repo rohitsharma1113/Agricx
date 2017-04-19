@@ -19,8 +19,13 @@
     <string name="could_not_create_image_file">Could not create image file</string>
     <string name="rename_failed">Failed to rename image</string>
     <string name="temp_file_does_not_exist">Temporary image file does not exist</string>
+    <string name="image_uri_not_found">Image uri not found</string>
+    <string name="could_not_load_image">Could not load image</string>
 
     <string name="enter_lot_id">Enter Lot ID</string>
     <string name="enter_sample_id">Enter Sample ID</string>
     <string name="enter_image_id">Enter Image ID</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

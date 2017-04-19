@@ -1,4 +1,4 @@
-package com.agricx.app.agricximagecapture.ui;
+package com.agricx.app.agricximagecapture.ui.activity;
 
 import android.Manifest;
 import android.content.Context;
@@ -8,10 +8,10 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -30,6 +30,9 @@ import com.agricx.app.agricximagecapture.data.FileStorage;
 import com.agricx.app.agricximagecapture.pojo.ImageCollectionLog;
 import com.agricx.app.agricximagecapture.pojo.LotInfo;
 import com.agricx.app.agricximagecapture.pojo.SampleInfo;
+import com.agricx.app.agricximagecapture.ui.LogReaderTask;
+import com.agricx.app.agricximagecapture.ui.LogSaverTask;
+import com.agricx.app.agricximagecapture.ui.fragment.ImagePreviewFragment;
 import com.agricx.app.agricximagecapture.utility.AppConstants;
 import com.agricx.app.agricximagecapture.utility.UiUtility;
 import com.agricx.app.agricximagecapture.utility.Utility;
@@ -60,6 +63,7 @@ public class CaptureActivity extends AppCompatActivity {
     @BindView(R.id.progressBar) ProgressBar progressBar;
 
     private Bitmap capturedImageBitmap;
+    private Uri capturedImageUri;
     private LotInfo enteredLotInfo;
     private SampleInfo enteredSampleInfo;
     private ImageCollectionLog imageCollectionLog;
@@ -110,13 +114,15 @@ public class CaptureActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         ButterKnife.bind(this);
         progressBar.setVisibility(View.GONE);
+        ivPreview.setVisibility(View.GONE);
     }
 
     @OnClick({
             R.id.act_capture_b_camera,
             R.id.act_capture_b_enter_lot_id,
             R.id.act_capture_b_enter_sample_id,
-            R.id.act_capture_b_save_next
+            R.id.act_capture_b_save_next,
+            R.id.act_capture_iv_preview
     })
     void onClick(View view){
         int id = view.getId();
@@ -132,13 +138,26 @@ public class CaptureActivity extends AppCompatActivity {
                 return;
             case R.id.act_capture_b_enter_sample_id:
                 fillAppropriateImageId();
+                return;
+            case R.id.act_capture_iv_preview:
+                openPreviewDialog();
+        }
+    }
+
+    private void openPreviewDialog(){
+        if (capturedImageUri != null){
+            FragmentManager fm = getSupportFragmentManager();
+            ImagePreviewFragment imagePreviewFragment = ImagePreviewFragment.getInstance(capturedImageUri);
+            imagePreviewFragment.show(fm, "");
+        } else {
+            Toast.makeText(this, R.string.image_uri_not_found, Toast.LENGTH_SHORT).show();
         }
     }
 
     private void fillAppropriateSampleAndImageId(){
         final String lotId = etLotId.getText().toString().trim();
         if (lotId.length() == 0){
-            UiUtility.requestFocusAndOpenKeyboard(this, R.string.enter_lot_id, etLotId);
+            Toast.makeText(this, getString(R.string.enter_lot_id), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -167,7 +186,7 @@ public class CaptureActivity extends AppCompatActivity {
         String lotId = etLotId.getText().toString().trim();
         String sampleId = etSampleId.getText().toString().trim();
         if (lotId.length() == 0){
-            UiUtility.requestFocusAndOpenKeyboard(this, R.string.enter_lot_id, etLotId);
+            Toast.makeText(this, getString(R.string.enter_lot_id), Toast.LENGTH_SHORT).show();
         } else if (sampleId.length() == 0){
             Toast.makeText(this, getString(R.string.sample_id_missing), Toast.LENGTH_SHORT).show();
         } else if (enteredLotInfo != null){
@@ -184,7 +203,7 @@ public class CaptureActivity extends AppCompatActivity {
         }
     }
 
-    private File createImageFile(String fileName) throws IOException{
+    private File createTempImageFile() throws IOException{
         File myDir = Utility.getAgricxImagesFolderName();
         if (!myDir.exists()){
             if (!myDir.mkdirs()){
@@ -192,7 +211,7 @@ public class CaptureActivity extends AppCompatActivity {
                 return null;
             }
         }
-        return new File(myDir, fileName);
+        return new File(myDir, AppConstants.TEMP_IMAGE_NAME);
     }
 
     private void dispatchTakePictureIntent() {
@@ -200,7 +219,7 @@ public class CaptureActivity extends AppCompatActivity {
         if (takePictureIntent.resolveActivity(getPackageManager()) !=  null) {
             File photoFile;
             try {
-                photoFile = createImageFile(AppConstants.TEMP_IMAGE_NAME);
+                photoFile = createTempImageFile();
             } catch (IOException ex) {
                 Toast.makeText(this, getString(R.string.could_not_create_image_file), Toast.LENGTH_SHORT).show();
                 return;
@@ -241,7 +260,7 @@ public class CaptureActivity extends AppCompatActivity {
         if (capturedImageBitmap == null){
             Toast.makeText(this, getString(R.string.please_capture_image), Toast.LENGTH_SHORT).show();
         } else if (lotId.length() == 0){
-            UiUtility.requestFocusAndOpenKeyboard(this, R.string.enter_lot_id, etLotId);
+            Toast.makeText(this, getString(R.string.enter_lot_id), Toast.LENGTH_SHORT).show();
         } else if (sampleId.length() == 0){
             Toast.makeText(this, getString(R.string.sample_id_missing), Toast.LENGTH_SHORT).show();
         } else if (imageId.length() == 0){
@@ -263,6 +282,7 @@ public class CaptureActivity extends AppCompatActivity {
                     @Override
                     public void onLogSaveDone(Boolean saved) {
                         if (saved){
+                            capturedImageUri = null;
                             capturedImageBitmap = null;
                             ivPreview.setVisibility(View.GONE);
                             bOpenCamera.setVisibility(View.VISIBLE);
@@ -303,19 +323,27 @@ public class CaptureActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Uri imageUri = data.getData();
-        try {
-            capturedImageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),imageUri);
-            if (capturedImageBitmap != null){
-                ivPreview.setVisibility(View.VISIBLE);
-                ivPreview.setImageBitmap(capturedImageBitmap);
-                bOpenCamera.setVisibility(View.GONE);
-            } else {
-                Toast.makeText(this, getString(R.string.could_not_capture), Toast.LENGTH_SHORT).show();
+        if (requestCode == REQUEST_IMAGE_CAPTURE){
+            if (resultCode == RESULT_OK){
+                capturedImageUri = data.getData();
+                if (capturedImageUri == null){
+                    Toast.makeText(this, getString(R.string.image_uri_not_found), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                try {
+                    capturedImageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), capturedImageUri);
+                    if (capturedImageBitmap != null){
+                        ivPreview.setVisibility(View.VISIBLE);
+                        ivPreview.setImageBitmap(capturedImageBitmap);
+                        bOpenCamera.setVisibility(View.GONE);
+                    } else {
+                        Toast.makeText(this, getString(R.string.could_not_capture), Toast.LENGTH_SHORT).show();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(this, getString(R.string.could_not_capture), Toast.LENGTH_SHORT).show();
+                }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(this, getString(R.string.could_not_capture), Toast.LENGTH_SHORT).show();
         }
     }
 
