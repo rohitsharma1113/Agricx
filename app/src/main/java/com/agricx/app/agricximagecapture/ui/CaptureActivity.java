@@ -1,16 +1,17 @@
 package com.agricx.app.agricximagecapture.ui;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -29,11 +30,12 @@ import com.agricx.app.agricximagecapture.data.FileStorage;
 import com.agricx.app.agricximagecapture.pojo.ImageCollectionLog;
 import com.agricx.app.agricximagecapture.pojo.LotInfo;
 import com.agricx.app.agricximagecapture.pojo.SampleInfo;
+import com.agricx.app.agricximagecapture.utility.AppConstants;
 import com.agricx.app.agricximagecapture.utility.UiUtility;
 import com.agricx.app.agricximagecapture.utility.Utility;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -47,7 +49,7 @@ public class CaptureActivity extends AppCompatActivity {
     private static final String TAG = CaptureActivity.class.getSimpleName();
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
-    private static final int REQUEST_WRITE_PERMISSION = 2;
+    public static final int REQUEST_PERMISSIONS_ALL = 100;
 
     @BindView(R.id.act_capture_iv_preview) ImageView ivPreview;
     @BindView(R.id.act_capture_b_camera) Button bOpenCamera;
@@ -66,22 +68,39 @@ public class CaptureActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupInitialView();
-        areReadWritePermissionsGranted();
+        checkPermissions();
     }
 
-    private void areReadWritePermissionsGranted(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            if (permissionCheck != PackageManager.PERMISSION_GRANTED){
-                requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_PERMISSION);
+    private void checkPermissions(){
+        String[] PERMISSIONS = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        if(!hasPermissions(this, PERMISSIONS)){
+            ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_PERMISSIONS_ALL);
+        }
+    }
+
+    public boolean hasPermissions(Context context, String... permissions) {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
             }
         }
+        return true;
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_WRITE_PERMISSION && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-            finish();
+        if (requestCode == REQUEST_PERMISSIONS_ALL){
+            if (grantResults.length > 0) {
+                for (int i = 0; i<permissions.length; i++){
+                    if (grantResults[i] != PackageManager.PERMISSION_GRANTED){
+                        finish();
+                    }
+                }
+            } else {
+                finish();
+            }
         }
     }
 
@@ -128,7 +147,7 @@ public class CaptureActivity extends AppCompatActivity {
             @Override
             public void onLogReadDone(ImageCollectionLog log) {
                 imageCollectionLog = FileStorage.getCompleteImageCollectionLog(getApplicationContext());
-                enteredLotInfo = Utility.getLotInfoFromLotId(getApplicationContext(), lotId, imageCollectionLog);
+                enteredLotInfo = Utility.getLotInfoFromLotId(lotId, imageCollectionLog);
                 if (enteredLotInfo != null){
                     ArrayList<SampleInfo> sampleInfoList = enteredLotInfo.getSampleInfoList();
                     enteredSampleInfo = Collections.max(sampleInfoList);
@@ -165,10 +184,35 @@ public class CaptureActivity extends AppCompatActivity {
         }
     }
 
+    private File createImageFile(String fileName) throws IOException{
+        File myDir = Utility.getAgricxImagesFolderName();
+        if (!myDir.exists()){
+            if (!myDir.mkdirs()){
+                Toast.makeText(this, getString(R.string.failed_directory_creation), Toast.LENGTH_SHORT).show();
+                return null;
+            }
+        }
+        return new File(myDir, fileName);
+    }
+
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) !=  null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            File photoFile;
+            try {
+                photoFile = createImageFile(AppConstants.TEMP_IMAGE_NAME);
+            } catch (IOException ex) {
+                Toast.makeText(this, getString(R.string.could_not_create_image_file), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (photoFile != null){
+                Uri photoFileUri = Uri.fromFile(photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoFileUri);
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            } else {
+                Toast.makeText(this, getString(R.string.could_not_create_image_file), Toast.LENGTH_SHORT).show();
+            }
         } else {
             Toast.makeText(this, getString(R.string.could_not_open_camera), Toast.LENGTH_SHORT).show();
         }
@@ -205,29 +249,15 @@ public class CaptureActivity extends AppCompatActivity {
         } else if (!Utility.isExternalStorageWritable()){
             Toast.makeText(this, getString(R.string.external_storage_not_writable), Toast.LENGTH_SHORT).show();
         } else {
-            File myDir = new File(Environment.getExternalStoragePublicDirectory(
-                    Environment.DIRECTORY_PICTURES), "test");
-            if (!myDir.exists()){
-                if (!myDir.mkdirs()){
-                    Toast.makeText(this, getString(R.string.failed_directory_creation), Toast.LENGTH_SHORT).show();
-                    return;
-                }
+            File myDir = Utility.getAgricxImagesFolderName();
+            File tempPhotoFile = new File(myDir, AppConstants.TEMP_IMAGE_NAME);
+            if (!tempPhotoFile.exists()){
+                Toast.makeText(getApplicationContext(), R.string.temp_file_does_not_exist, Toast.LENGTH_SHORT).show();
+                return;
             }
-            String filename = (new StringBuilder()).append(lotId).append("_").append(sampleId).append("_").append(imageId).append(".jpg").toString();
-            File file = new File (myDir, filename);
-            try {
-                UiUtility.showProgressBarAndDisableTouch(progressBar, getWindow());
-                FileOutputStream out = new FileOutputStream(file);
-                capturedImageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-                out.flush();
-                out.close();
-
-                MediaScannerConnection.scanFile(this, new String[] { file.toString() }, null,
-                        new MediaScannerConnection.OnScanCompletedListener() {
-                            public void onScanCompleted(String path, Uri uri) {
-                            }
-                        });
-
+            String renamedPhotoName = (new StringBuilder()).append(lotId).append("_").append(sampleId).append("_").append(imageId).append(".jpg").toString();
+            File finalPhotoFile = new File(myDir, renamedPhotoName);
+            if (tempPhotoFile.renameTo(finalPhotoFile)){
                 saveLotInfoToCollectionLogVariable();
                 (new LogSaverTask(this, imageCollectionLog, new LogSaverTask.LogSaveDoneListener() {
                     @Override
@@ -240,13 +270,13 @@ public class CaptureActivity extends AppCompatActivity {
                             tvImageId.setText(String.valueOf(newImageId));
                             Toast.makeText(getApplicationContext(), R.string.image_save_success, Toast.LENGTH_SHORT).show();
                         } else {
-                            // TODO : handle image save failure
+                            Toast.makeText(getApplicationContext(), R.string.image_save_failed, Toast.LENGTH_SHORT).show();
                         }
                         UiUtility.hideProgressBarAndEnableTouch(progressBar, getWindow());
                     }
                 })).execute();
-            } catch (Exception e) {
-                e.printStackTrace();
+            } else {
+                Toast.makeText(getApplicationContext(), R.string.rename_failed, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -273,9 +303,9 @@ public class CaptureActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            capturedImageBitmap = (Bitmap) extras.get("data");
+        Uri imageUri = data.getData();
+        try {
+            capturedImageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),imageUri);
             if (capturedImageBitmap != null){
                 ivPreview.setVisibility(View.VISIBLE);
                 ivPreview.setImageBitmap(capturedImageBitmap);
@@ -283,6 +313,9 @@ public class CaptureActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, getString(R.string.could_not_capture), Toast.LENGTH_SHORT).show();
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, getString(R.string.could_not_capture), Toast.LENGTH_SHORT).show();
         }
     }
 

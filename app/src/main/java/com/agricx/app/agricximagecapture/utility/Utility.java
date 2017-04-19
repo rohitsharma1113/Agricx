@@ -9,6 +9,7 @@ import com.agricx.app.agricximagecapture.pojo.ImageCollectionLog;
 import com.agricx.app.agricximagecapture.pojo.LotInfo;
 import com.agricx.app.agricximagecapture.pojo.SampleInfo;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -28,7 +29,7 @@ public class Utility {
     }
 
     @Nullable
-    public static LotInfo getLotInfoFromLotId(Context context, String lotId, ImageCollectionLog completeImageCollectionLog){
+    public static LotInfo getLotInfoFromLotId(String lotId, ImageCollectionLog completeImageCollectionLog){
         if (completeImageCollectionLog != null){
             for (LotInfo lotInfo: completeImageCollectionLog.getLotInfoList()){
                 if (lotInfo.getLotId().equalsIgnoreCase(lotId)){
@@ -46,7 +47,11 @@ public class Utility {
                 return sampleInfo;
             }
         }
-
         return null;
+    }
+
+    public static File getAgricxImagesFolderName(){
+        return new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                AppConstants.ARICX_IMAGES_FOLDER_NAME);
     }
 }
