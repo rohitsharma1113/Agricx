@@ -103,20 +103,26 @@
 
         </LinearLayout>
 
-
-        <android.support.design.widget.TextInputLayout
+        <TextView
+            style="@style/Base.TextAppearance.AppCompat.Subhead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/very_small_margin">
+            android:textStyle="bold"
+            android:layout_marginTop="@dimen/small_to_medium_margin"
+            android:padding="@dimen/very_small_padding"
+            android:text="@string/image_id"/>
 
-            <EditText
-                android:id="@+id/act_capture_et_image_id"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/image_id"
-                android:inputType="number"/>
 
-        </android.support.design.widget.TextInputLayout>
+        <TextView
+            android:id="@+id/act_capture_tv_image_id"
+            style="@style/Base.TextAppearance.AppCompat.Headline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/very_small_margin"
+            android:layout_marginRight="@dimen/very_small_margin"
+            android:background="@drawable/border_tv"
+            android:padding="@dimen/small_margin"
+            tools:text="1234"/>
 
         <Button
             android:id="@+id/act_capture_b_save_next"

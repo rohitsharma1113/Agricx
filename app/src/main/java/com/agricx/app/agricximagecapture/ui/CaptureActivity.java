@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.agricx.app.agricximagecapture.R;
@@ -51,7 +52,7 @@ public class CaptureActivity extends AppCompatActivity {
     @BindView(R.id.act_capture_b_camera) Button bOpenCamera;
     @BindView(R.id.act_capture_et_lot_id) EditText etLotId;
     @BindView(R.id.act_capture_et_sample_id) EditText etSampleId;
-    @BindView(R.id.act_capture_et_image_id) EditText etImageId;
+    @BindView(R.id.act_capture_tv_image_id) TextView tvImageId;
     @BindView(R.id.act_capture_b_save_next) Button bSaveAndNext;
 
     private Bitmap capturedImageBitmap;
@@ -127,10 +128,10 @@ public class CaptureActivity extends AppCompatActivity {
             enteredSampleInfo = Collections.max(sampleInfoList);
             etSampleId.setText(String.valueOf(enteredSampleInfo.getSampleId()));
             ArrayList<Integer> imageIdList = enteredSampleInfo.getImageIdList();
-            etImageId.setText(String.valueOf(Collections.max(imageIdList) + 1));
+            tvImageId.setText(String.valueOf(Collections.max(imageIdList) + 1));
         } else {
             etSampleId.setText("1");
-            etImageId.setText("1");
+            tvImageId.setText("1");
         }
     }
 
@@ -140,18 +141,18 @@ public class CaptureActivity extends AppCompatActivity {
         if (lotId.length() == 0){
             UiUtility.requestFocusAndOpenKeyboard(this, R.string.enter_lot_id, etLotId);
         } else if (sampleId.length() == 0){
-            UiUtility.requestFocusAndOpenKeyboard(this, R.string.enter_sample_id, etSampleId);
+            Toast.makeText(this, getString(R.string.sample_id_missing), Toast.LENGTH_SHORT).show();
         } else if (enteredLotInfo != null){
             ArrayList<SampleInfo> sampleInfoList = enteredLotInfo.getSampleInfoList();
             enteredSampleInfo = Utility.getSampleInfoFromSampleId(Long.parseLong(sampleId), sampleInfoList);
             if (enteredSampleInfo != null){
                 ArrayList<Integer> imageIdList = enteredSampleInfo.getImageIdList();
-                etImageId.setText(String.valueOf(Collections.max(imageIdList) + 1));
+                tvImageId.setText(String.valueOf(Collections.max(imageIdList) + 1));
             } else {
-                etImageId.setText("1");
+                tvImageId.setText("1");
             }
         } else {
-            etImageId.setText("1");
+            tvImageId.setText("1");
         }
     }
 
@@ -168,30 +169,30 @@ public class CaptureActivity extends AppCompatActivity {
     void onLotIdChanged(){
         if (getCurrentFocus() == etLotId){
             etSampleId.setText("");
-            etImageId.setText("");
+            tvImageId.setText("");
         }
     }
 
     @OnTextChanged(value = R.id.act_capture_et_sample_id, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     void onSampleIdChanged(){
         if (getCurrentFocus() == etSampleId){
-            etImageId.setText("");
+            tvImageId.setText("");
         }
     }
 
     private void saveImageToSdCard(){
         String lotId = etLotId.getText().toString().trim();
         String sampleId = etSampleId.getText().toString().trim();
-        String imageId = etImageId.getText().toString().trim();
+        String imageId = tvImageId.getText().toString().trim();
 
         if (capturedImageBitmap == null){
             Toast.makeText(this, getString(R.string.please_capture_image), Toast.LENGTH_SHORT).show();
         } else if (lotId.length() == 0){
             UiUtility.requestFocusAndOpenKeyboard(this, R.string.enter_lot_id, etLotId);
         } else if (sampleId.length() == 0){
-            UiUtility.requestFocusAndOpenKeyboard(this, R.string.enter_sample_id, etSampleId);
+            Toast.makeText(this, getString(R.string.sample_id_missing), Toast.LENGTH_SHORT).show();
         } else if (imageId.length() == 0){
-            UiUtility.requestFocusAndOpenKeyboard(this, R.string.enter_image_id, etImageId);
+            Toast.makeText(this, getString(R.string.image_id_missing), Toast.LENGTH_SHORT).show();
         } else if (!Utility.isExternalStorageWritable()){
             Toast.makeText(this, getString(R.string.external_storage_not_writable), Toast.LENGTH_SHORT).show();
         } else {
@@ -222,7 +223,7 @@ public class CaptureActivity extends AppCompatActivity {
                     ivPreview.setVisibility(View.GONE);
                     bOpenCamera.setVisibility(View.VISIBLE);
                     int newImageId = Integer.parseInt(imageId) + 1;
-                    etImageId.setText(String.valueOf(newImageId));
+                    tvImageId.setText(String.valueOf(newImageId));
                     Toast.makeText(this, R.string.image_save_success, Toast.LENGTH_SHORT).show();
                 } else {
                     // TODO : handle image save failure
@@ -249,7 +250,7 @@ public class CaptureActivity extends AppCompatActivity {
                     enteredSampleInfo = new SampleInfo(Long.parseLong(etSampleId.getText().toString().trim()));
                     enteredLotInfo.getSampleInfoList().add(enteredSampleInfo);
                 } else {
-                    enteredSampleInfo.getImageIdList().add(Integer.valueOf(etImageId.getText().toString().trim()));
+                    enteredSampleInfo.getImageIdList().add(Integer.valueOf(tvImageId.getText().toString().trim()));
                 }
             }
         }
