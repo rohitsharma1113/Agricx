@@ -13,7 +13,7 @@
     <string name="external_storage_not_writable">External storage not writable</string>
     <string name="failed_directory_creation">Failed to create images folder</string>
     <string name="image_save_success">Image Saved Successfully</string>
-    <string name="image_save_failed">Failed To Save Image</string>
+    <string name="image_log_save_failed">Failed To Save Image Log. App Will be restarted</string>
     <string name="image_id_missing">Image ID missing</string>
     <string name="sample_id_missing">Sample ID missing</string>
     <string name="could_not_create_image_file">Could not create image file</string>
@@ -22,11 +22,13 @@
     <string name="file_already_exits">Image with the given name already exits</string>
     <string name="image_uri_not_found">Image uri not found</string>
     <string name="could_not_load_image">Could not load image</string>
+    <string name="success_title">Success</string>
+    <string name="success_msg">Image has been saved successfully. Image counter will be updated automatically.</string>
+    <string name="fail_title">Failed</string>
+    <string name="fail_msg">Failed to save image log. This may be a memory issue. Please check and restart the app after closing this box.</string>
+    <string name="ok">OK</string>
 
     <string name="enter_lot_id">Enter Lot ID</string>
     <string name="enter_sample_id">Enter Sample ID</string>
     <string name="enter_image_id">Enter Image ID</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

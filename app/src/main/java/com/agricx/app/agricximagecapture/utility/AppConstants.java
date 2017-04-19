@@ -12,5 +12,5 @@ public class AppConstants {
     public static final int EMPTY_STRING_RES = -1;
 
     public static final String TEMP_IMAGE_NAME = "temp.jpg";
-    public static final String ARICX_IMAGES_FOLDER_NAME = "test";
+    public static final String ARICX_IMAGES_FOLDER_NAME = "agricx";
 }

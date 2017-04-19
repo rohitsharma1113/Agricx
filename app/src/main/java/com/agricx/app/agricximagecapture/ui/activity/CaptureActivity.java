@@ -1,6 +1,7 @@
 package com.agricx.app.agricximagecapture.ui.activity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -69,6 +70,7 @@ public class CaptureActivity extends AppCompatActivity {
     private LotInfo enteredLotInfo;
     private SampleInfo enteredSampleInfo;
     private ImageCollectionLog imageCollectionLog;
+    private Activity thisActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +117,7 @@ public class CaptureActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ButterKnife.bind(this);
+        thisActivity = this;
         progressBar.setVisibility(View.GONE);
         ivPreview.setVisibility(View.GONE);
         bRetake.setVisibility(View.GONE);
@@ -294,28 +297,20 @@ public class CaptureActivity extends AppCompatActivity {
             File tempPhotoFile = new File(myDir, AppConstants.TEMP_IMAGE_NAME);
             String renamedPhotoName = (new StringBuilder()).append(lotId).append("_").append(sampleId).append("_").append(imageId).append(".jpg").toString();
             File finalPhotoFile = new File(myDir, renamedPhotoName);
-//            if (finalPhotoFile.exists()){
-//                Toast.makeText(getApplicationContext(), R.string.file_already_exits, Toast.LENGTH_SHORT).show();
-//                return;
-//            }
-//            if (!tempPhotoFile.exists()){
-//                Toast.makeText(getApplicationContext(), R.string.temp_file_does_not_exist, Toast.LENGTH_SHORT).show();
-//                return;
-//            }
             if (tempPhotoFile.renameTo(finalPhotoFile)){
                 saveLotInfoToCollectionLogVariable();
                 (new LogSaverTask(this, imageCollectionLog, new LogSaverTask.LogSaveDoneListener() {
                     @Override
                     public void onLogSaveDone(Boolean saved) {
+                        UiUtility.hideProgressBarAndEnableTouch(progressBar, getWindow());
                         if (saved){
                             prepareNewCapture();
                             int newImageId = Integer.parseInt(imageId) + 1;
                             tvImageId.setText(String.valueOf(newImageId));
-                            Toast.makeText(getApplicationContext(), R.string.image_save_success, Toast.LENGTH_SHORT).show();
+                            UiUtility.showSuccessAlertDialog(thisActivity);
                         } else {
-                            Toast.makeText(getApplicationContext(), R.string.image_save_failed, Toast.LENGTH_SHORT).show();
+                            UiUtility.showLogSaveFailedDialog(thisActivity);
                         }
-                        UiUtility.hideProgressBarAndEnableTouch(progressBar, getWindow());
                     }
                 })).execute();
             } else {
@@ -356,11 +351,12 @@ public class CaptureActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE){
             if (resultCode == RESULT_OK){
-                capturedImageUri = data.getData();
-                if (capturedImageUri == null){
+                File tempFile = new File(Utility.getAgricxImagesFolderName(), AppConstants.TEMP_IMAGE_NAME);
+                if (!tempFile.exists()){
                     Toast.makeText(this, getString(R.string.image_uri_not_found), Toast.LENGTH_SHORT).show();
                     return;
                 }
+                capturedImageUri = Uri.fromFile(tempFile);
                 try {
                     capturedImageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), capturedImageUri);
                     if (capturedImageBitmap != null){
