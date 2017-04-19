@@ -21,19 +21,21 @@ public class FileStorage {
 
     private static final String FILE_IMAGE_COLLECTION_LOG = "file_collection_log";
 
-    public static void saveImageCollectionLog(Context context, ImageCollectionLog imageCollectionLog){
+    public static boolean saveCompleteImageCollectionLog(Context context, ImageCollectionLog imageCollectionLog){
         String data = (new Gson()).toJson(imageCollectionLog);
         try {
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(FILE_IMAGE_COLLECTION_LOG, Context.MODE_PRIVATE));
             outputStreamWriter.write(data);
             outputStreamWriter.close();
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
     @Nullable
-    public static ImageCollectionLog getImageCollectionLog(Context context){
+    public static ImageCollectionLog getCompleteImageCollectionLog(Context context){
         try {
             FileInputStream fis = context.openFileInput(FILE_IMAGE_COLLECTION_LOG);
             InputStreamReader isr = new InputStreamReader(fis);

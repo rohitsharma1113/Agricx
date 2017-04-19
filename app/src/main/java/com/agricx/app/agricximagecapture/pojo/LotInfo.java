@@ -11,16 +11,30 @@ import java.util.ArrayList;
 public class LotInfo {
 
     @SerializedName("lotId")
-    private long lotId;
+    private String lotId;
 
     @SerializedName("samples")
     private ArrayList<SampleInfo> sampleInfoList;
 
-    public long getLotId() {
+    public LotInfo(String lotId, long sampleId){
+        this.lotId = lotId;
+        this.sampleInfoList = new ArrayList<>();
+        this.sampleInfoList.add(new SampleInfo(sampleId));
+    }
+
+    public String getLotId() {
         return lotId;
     }
 
     public ArrayList<SampleInfo> getSampleInfoList() {
         return sampleInfoList;
+    }
+
+    public void setLotId(String lotId) {
+        this.lotId = lotId;
+    }
+
+    public void setSampleInfoList(ArrayList<SampleInfo> sampleInfoList) {
+        this.sampleInfoList = sampleInfoList;
     }
 }

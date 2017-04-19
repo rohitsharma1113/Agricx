@@ -12,6 +12,7 @@
     <string name="please_capture_image">Please capture an image</string>
     <string name="external_storage_not_writable">External storage not writable</string>
     <string name="failed_directory_creation">Failed to create images folder</string>
+    <string name="image_save_success">Image Saved Successfully</string>
 
     <string name="enter_lot_id">Enter Lot ID</string>
     <string name="enter_sample_id">Enter Sample ID</string>

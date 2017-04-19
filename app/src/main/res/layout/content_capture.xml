@@ -40,20 +40,37 @@
                 android:text="@string/capture_image"/>
 
         </FrameLayout>
-
-        <android.support.design.widget.TextInputLayout
+        
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:layout_marginTop="@dimen/medium_margin">
 
-            <EditText
-                android:id="@+id/act_capture_et_lot_id"
-                android:layout_width="match_parent"
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="@string/lot_id"
-                android:inputType="text"/>
+                android:layout_weight="0.85">
 
-        </android.support.design.widget.TextInputLayout>
+                <EditText
+                    android:id="@+id/act_capture_et_lot_id"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/lot_id"
+                    android:inputType="text"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <ImageButton
+                android:id="@+id/act_capture_b_enter_lot_id"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.15"
+                android:scaleType="fitCenter"
+                android:background="@android:color/transparent"
+                android:src="@drawable/subtract"/>
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -76,20 +93,13 @@
             </android.support.design.widget.TextInputLayout>
 
             <ImageButton
-                android:id="@+id/act_capture_b_minus_sample_id"
+                android:id="@+id/act_capture_b_enter_sample_id"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.15"
+                android:scaleType="fitCenter"
                 android:background="@android:color/transparent"
                 android:src="@drawable/subtract"/>
-
-            <ImageButton
-                android:id="@+id/act_capture_b_plus_sample_id"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.15"
-                android:background="@android:color/transparent"
-                android:src="@drawable/add"/>
 
         </LinearLayout>
 
