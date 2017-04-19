@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,6 +55,7 @@ public class CaptureActivity extends AppCompatActivity {
     @BindView(R.id.act_capture_et_sample_id) EditText etSampleId;
     @BindView(R.id.act_capture_tv_image_id) TextView tvImageId;
     @BindView(R.id.act_capture_b_save_next) Button bSaveAndNext;
+    @BindView(R.id.progressBar) ProgressBar progressBar;
 
     private Bitmap capturedImageBitmap;
     private LotInfo enteredLotInfo;
@@ -64,7 +66,6 @@ public class CaptureActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupInitialView();
-        ButterKnife.bind(this);
         areReadWritePermissionsGranted();
     }
 
@@ -89,6 +90,7 @@ public class CaptureActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ButterKnife.bind(this);
+        progressBar.setVisibility(View.GONE);
     }
 
     @OnClick({
@@ -115,24 +117,31 @@ public class CaptureActivity extends AppCompatActivity {
     }
 
     private void fillAppropriateSampleAndImageId(){
-        String lotId = etLotId.getText().toString().trim();
+        final String lotId = etLotId.getText().toString().trim();
         if (lotId.length() == 0){
             UiUtility.requestFocusAndOpenKeyboard(this, R.string.enter_lot_id, etLotId);
             return;
         }
 
-        imageCollectionLog = FileStorage.getCompleteImageCollectionLog(this);
-        enteredLotInfo = Utility.getLotInfoFromLotId(this, lotId, imageCollectionLog);
-        if (enteredLotInfo != null){
-            ArrayList<SampleInfo> sampleInfoList = enteredLotInfo.getSampleInfoList();
-            enteredSampleInfo = Collections.max(sampleInfoList);
-            etSampleId.setText(String.valueOf(enteredSampleInfo.getSampleId()));
-            ArrayList<Integer> imageIdList = enteredSampleInfo.getImageIdList();
-            tvImageId.setText(String.valueOf(Collections.max(imageIdList) + 1));
-        } else {
-            etSampleId.setText("1");
-            tvImageId.setText("1");
-        }
+        UiUtility.showProgressBarAndDisableTouch(progressBar, getWindow());
+        (new LogReaderTask(this, new LogReaderTask.LogReadDoneListener() {
+            @Override
+            public void onLogReadDone(ImageCollectionLog log) {
+                imageCollectionLog = FileStorage.getCompleteImageCollectionLog(getApplicationContext());
+                enteredLotInfo = Utility.getLotInfoFromLotId(getApplicationContext(), lotId, imageCollectionLog);
+                if (enteredLotInfo != null){
+                    ArrayList<SampleInfo> sampleInfoList = enteredLotInfo.getSampleInfoList();
+                    enteredSampleInfo = Collections.max(sampleInfoList);
+                    etSampleId.setText(String.valueOf(enteredSampleInfo.getSampleId()));
+                    ArrayList<Integer> imageIdList = enteredSampleInfo.getImageIdList();
+                    tvImageId.setText(String.valueOf(Collections.max(imageIdList) + 1));
+                } else {
+                    etSampleId.setText("1");
+                    tvImageId.setText("1");
+                }
+                UiUtility.hideProgressBarAndEnableTouch(progressBar, getWindow());
+            }
+        })).execute();
     }
 
     private void fillAppropriateImageId(){
@@ -183,7 +192,7 @@ public class CaptureActivity extends AppCompatActivity {
     private void saveImageToSdCard(){
         String lotId = etLotId.getText().toString().trim();
         String sampleId = etSampleId.getText().toString().trim();
-        String imageId = tvImageId.getText().toString().trim();
+        final String imageId = tvImageId.getText().toString().trim();
 
         if (capturedImageBitmap == null){
             Toast.makeText(this, getString(R.string.please_capture_image), Toast.LENGTH_SHORT).show();
@@ -207,6 +216,7 @@ public class CaptureActivity extends AppCompatActivity {
             String filename = (new StringBuilder()).append(lotId).append("_").append(sampleId).append("_").append(imageId).append(".jpg").toString();
             File file = new File (myDir, filename);
             try {
+                UiUtility.showProgressBarAndDisableTouch(progressBar, getWindow());
                 FileOutputStream out = new FileOutputStream(file);
                 capturedImageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
                 out.flush();
@@ -218,25 +228,30 @@ public class CaptureActivity extends AppCompatActivity {
                             }
                         });
 
-                if (saveLotInfoToCollectionLog()){
-                    capturedImageBitmap = null;
-                    ivPreview.setVisibility(View.GONE);
-                    bOpenCamera.setVisibility(View.VISIBLE);
-                    int newImageId = Integer.parseInt(imageId) + 1;
-                    tvImageId.setText(String.valueOf(newImageId));
-                    Toast.makeText(this, R.string.image_save_success, Toast.LENGTH_SHORT).show();
-                } else {
-                    // TODO : handle image save failure
-                }
-
-
+                saveLotInfoToCollectionLogVariable();
+                (new LogSaverTask(this, imageCollectionLog, new LogSaverTask.LogSaveDoneListener() {
+                    @Override
+                    public void onLogSaveDone(Boolean saved) {
+                        if (saved){
+                            capturedImageBitmap = null;
+                            ivPreview.setVisibility(View.GONE);
+                            bOpenCamera.setVisibility(View.VISIBLE);
+                            int newImageId = Integer.parseInt(imageId) + 1;
+                            tvImageId.setText(String.valueOf(newImageId));
+                            Toast.makeText(getApplicationContext(), R.string.image_save_success, Toast.LENGTH_SHORT).show();
+                        } else {
+                            // TODO : handle image save failure
+                        }
+                        UiUtility.hideProgressBarAndEnableTouch(progressBar, getWindow());
+                    }
+                })).execute();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private boolean saveLotInfoToCollectionLog(){
+    private void saveLotInfoToCollectionLogVariable(){
         if (imageCollectionLog == null){
             enteredLotInfo = new LotInfo(etLotId.getText().toString().trim(), Long.parseLong(etSampleId.getText().toString().trim()));
             imageCollectionLog = new ImageCollectionLog();
@@ -254,7 +269,6 @@ public class CaptureActivity extends AppCompatActivity {
                 }
             }
         }
-        return FileStorage.saveCompleteImageCollectionLog(this, imageCollectionLog);
     }
 
     @Override
