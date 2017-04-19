@@ -172,6 +172,7 @@ public class CaptureActivity extends AppCompatActivity {
         (new LogReaderTask(this, new LogReaderTask.LogReadDoneListener() {
             @Override
             public void onLogReadDone(ImageCollectionLog log) {
+                UiUtility.hideProgressBarAndEnableTouch(progressBar, getWindow());
                 imageCollectionLog = FileStorage.getCompleteImageCollectionLog(getApplicationContext());
                 enteredLotInfo = Utility.getLotInfoFromLotId(lotId, imageCollectionLog);
                 if (enteredLotInfo != null){
@@ -184,30 +185,44 @@ public class CaptureActivity extends AppCompatActivity {
                     etSampleId.setText("1");
                     tvImageId.setText("1");
                 }
-                UiUtility.hideProgressBarAndEnableTouch(progressBar, getWindow());
+                etSampleId.requestFocus();
             }
         })).execute();
     }
 
     private void fillAppropriateImageId(){
-        String lotId = etLotId.getText().toString().trim();
-        String sampleId = etSampleId.getText().toString().trim();
+        final String lotId = etLotId.getText().toString().trim();
+        final String sampleId = etSampleId.getText().toString().trim();
         if (lotId.length() == 0){
             Toast.makeText(this, getString(R.string.enter_lot_id), Toast.LENGTH_SHORT).show();
+            return;
         } else if (sampleId.length() == 0){
-            Toast.makeText(this, getString(R.string.sample_id_missing), Toast.LENGTH_SHORT).show();
-        } else if (enteredLotInfo != null){
-            ArrayList<SampleInfo> sampleInfoList = enteredLotInfo.getSampleInfoList();
-            enteredSampleInfo = Utility.getSampleInfoFromSampleId(Long.parseLong(sampleId), sampleInfoList);
-            if (enteredSampleInfo != null){
-                ArrayList<Integer> imageIdList = enteredSampleInfo.getImageIdList();
-                tvImageId.setText(String.valueOf(Collections.max(imageIdList) + 1));
-            } else {
-                tvImageId.setText("1");
-            }
-        } else {
-            tvImageId.setText("1");
+            Toast.makeText(this, getString(R.string.enter_sample_id), Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        UiUtility.showProgressBarAndDisableTouch(progressBar, getWindow());
+        (new LogReaderTask(this, new LogReaderTask.LogReadDoneListener() {
+            @Override
+            public void onLogReadDone(ImageCollectionLog log) {
+                UiUtility.hideProgressBarAndEnableTouch(progressBar, getWindow());
+                imageCollectionLog = FileStorage.getCompleteImageCollectionLog(getApplicationContext());
+                enteredLotInfo = Utility.getLotInfoFromLotId(lotId, imageCollectionLog);
+                if (enteredLotInfo != null){
+                    ArrayList<SampleInfo> sampleInfoList = enteredLotInfo.getSampleInfoList();
+                    enteredSampleInfo = Utility.getSampleInfoFromSampleId(Long.parseLong(sampleId), sampleInfoList);
+                    if (enteredSampleInfo != null){
+                        ArrayList<Integer> imageIdList = enteredSampleInfo.getImageIdList();
+                        tvImageId.setText(String.valueOf(Collections.max(imageIdList) + 1));
+                    } else {
+                        tvImageId.setText("1");
+                    }
+                } else {
+                    tvImageId.setText("1");
+                }
+                UiUtility.closeKeyboard(getApplicationContext(), etSampleId.getWindowToken());
+            }
+        })).execute();
     }
 
     private File createTempImageFile() throws IOException{
@@ -277,12 +292,16 @@ public class CaptureActivity extends AppCompatActivity {
         } else {
             File myDir = Utility.getAgricxImagesFolderName();
             File tempPhotoFile = new File(myDir, AppConstants.TEMP_IMAGE_NAME);
-            if (!tempPhotoFile.exists()){
-                Toast.makeText(getApplicationContext(), R.string.temp_file_does_not_exist, Toast.LENGTH_SHORT).show();
-                return;
-            }
             String renamedPhotoName = (new StringBuilder()).append(lotId).append("_").append(sampleId).append("_").append(imageId).append(".jpg").toString();
             File finalPhotoFile = new File(myDir, renamedPhotoName);
+//            if (finalPhotoFile.exists()){
+//                Toast.makeText(getApplicationContext(), R.string.file_already_exits, Toast.LENGTH_SHORT).show();
+//                return;
+//            }
+//            if (!tempPhotoFile.exists()){
+//                Toast.makeText(getApplicationContext(), R.string.temp_file_does_not_exist, Toast.LENGTH_SHORT).show();
+//                return;
+//            }
             if (tempPhotoFile.renameTo(finalPhotoFile)){
                 saveLotInfoToCollectionLogVariable();
                 (new LogSaverTask(this, imageCollectionLog, new LogSaverTask.LogSaveDoneListener() {

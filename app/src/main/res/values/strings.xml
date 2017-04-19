@@ -14,11 +14,12 @@
     <string name="failed_directory_creation">Failed to create images folder</string>
     <string name="image_save_success">Image Saved Successfully</string>
     <string name="image_save_failed">Failed To Save Image</string>
-    <string name="image_id_missing">Image ID not found</string>
+    <string name="image_id_missing">Image ID missing</string>
     <string name="sample_id_missing">Sample ID missing</string>
     <string name="could_not_create_image_file">Could not create image file</string>
     <string name="rename_failed">Failed to rename image</string>
     <string name="temp_file_does_not_exist">Temporary image file does not exist</string>
+    <string name="file_already_exits">Image with the given name already exits</string>
     <string name="image_uri_not_found">Image uri not found</string>
     <string name="could_not_load_image">Could not load image</string>
 

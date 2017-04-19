@@ -2,6 +2,7 @@ package com.agricx.app.agricximagecapture.utility;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.IBinder;
 import android.support.annotation.StringRes;
 import android.view.View;
 import android.view.Window;
@@ -33,5 +34,10 @@ public class UiUtility {
     public static void hideProgressBarAndEnableTouch(ProgressBar progressBar, Window window){
         progressBar.setVisibility(View.GONE);
         window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+    }
+
+    public static void closeKeyboard(Context context, IBinder iBinder) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(iBinder, 0);
     }
 }
