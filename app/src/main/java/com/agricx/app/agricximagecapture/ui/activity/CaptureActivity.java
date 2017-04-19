@@ -19,6 +19,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -71,6 +73,7 @@ public class CaptureActivity extends AppCompatActivity {
     private SampleInfo enteredSampleInfo;
     private ImageCollectionLog imageCollectionLog;
     private Activity thisActivity;
+    private Animation scaleUpAnimation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +124,7 @@ public class CaptureActivity extends AppCompatActivity {
         progressBar.setVisibility(View.GONE);
         ivPreview.setVisibility(View.GONE);
         bRetake.setVisibility(View.GONE);
+        scaleUpAnimation = AnimationUtils.loadAnimation(this,R.anim.scale_up_anim);
     }
 
     @OnClick({
@@ -342,9 +346,16 @@ public class CaptureActivity extends AppCompatActivity {
     private void prepareNewCapture(){
         capturedImageUri = null;
         capturedImageBitmap = null;
-        ivPreview.setVisibility(View.GONE);
-        bRetake.setVisibility(View.GONE);
         bOpenCamera.setVisibility(View.VISIBLE);
+        bOpenCamera.startAnimation(scaleUpAnimation);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            UiUtility.hideAnim(ivPreview);
+            UiUtility.hideAnim(bRetake);
+        } else {
+            ivPreview.setVisibility(View.GONE);
+            bRetake.setVisibility(View.GONE);
+        }
     }
 
     @Override

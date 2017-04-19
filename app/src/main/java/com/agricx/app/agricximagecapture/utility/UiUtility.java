@@ -1,12 +1,17 @@
 package com.agricx.app.agricximagecapture.utility;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.IBinder;
+import android.support.annotation.RequiresApi;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -71,5 +76,22 @@ public class UiUtility {
                 .setIcon(R.drawable.cross)
                 .create()
                 .show();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public static void hideAnim(final View view){
+        int cx = view.getWidth()/2;
+        int cy = view.getHeight()/2;
+        float initialRadius = (float) Math.hypot(cx, cy);
+        Animator anim;
+        anim = ViewAnimationUtils.createCircularReveal(view, cx, cy, initialRadius, 0);
+        anim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                view.setVisibility(View.GONE);
+            }
+        });
+        anim.start();
     }
 }
