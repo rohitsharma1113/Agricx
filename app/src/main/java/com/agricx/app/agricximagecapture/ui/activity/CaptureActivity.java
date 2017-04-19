@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -61,6 +62,7 @@ public class CaptureActivity extends AppCompatActivity {
     @BindView(R.id.act_capture_tv_image_id) TextView tvImageId;
     @BindView(R.id.act_capture_b_save_next) Button bSaveAndNext;
     @BindView(R.id.progressBar) ProgressBar progressBar;
+    @BindView(R.id.act_capture_b_retake) ImageButton bRetake;
 
     private Bitmap capturedImageBitmap;
     private Uri capturedImageUri;
@@ -115,6 +117,7 @@ public class CaptureActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         progressBar.setVisibility(View.GONE);
         ivPreview.setVisibility(View.GONE);
+        bRetake.setVisibility(View.GONE);
     }
 
     @OnClick({
@@ -122,7 +125,8 @@ public class CaptureActivity extends AppCompatActivity {
             R.id.act_capture_b_enter_lot_id,
             R.id.act_capture_b_enter_sample_id,
             R.id.act_capture_b_save_next,
-            R.id.act_capture_iv_preview
+            R.id.act_capture_iv_preview,
+            R.id.act_capture_b_retake
     })
     void onClick(View view){
         int id = view.getId();
@@ -141,6 +145,9 @@ public class CaptureActivity extends AppCompatActivity {
                 return;
             case R.id.act_capture_iv_preview:
                 openPreviewDialog();
+                return;
+            case R.id.act_capture_b_retake:
+                prepareNewCapture();
         }
     }
 
@@ -282,10 +289,7 @@ public class CaptureActivity extends AppCompatActivity {
                     @Override
                     public void onLogSaveDone(Boolean saved) {
                         if (saved){
-                            capturedImageUri = null;
-                            capturedImageBitmap = null;
-                            ivPreview.setVisibility(View.GONE);
-                            bOpenCamera.setVisibility(View.VISIBLE);
+                            prepareNewCapture();
                             int newImageId = Integer.parseInt(imageId) + 1;
                             tvImageId.setText(String.valueOf(newImageId));
                             Toast.makeText(getApplicationContext(), R.string.image_save_success, Toast.LENGTH_SHORT).show();
@@ -321,6 +325,14 @@ public class CaptureActivity extends AppCompatActivity {
         }
     }
 
+    private void prepareNewCapture(){
+        capturedImageUri = null;
+        capturedImageBitmap = null;
+        ivPreview.setVisibility(View.GONE);
+        bRetake.setVisibility(View.GONE);
+        bOpenCamera.setVisibility(View.VISIBLE);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE){
@@ -334,6 +346,7 @@ public class CaptureActivity extends AppCompatActivity {
                     capturedImageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), capturedImageUri);
                     if (capturedImageBitmap != null){
                         ivPreview.setVisibility(View.VISIBLE);
+                        bRetake.setVisibility(View.VISIBLE);
                         ivPreview.setImageBitmap(capturedImageBitmap);
                         bOpenCamera.setVisibility(View.GONE);
                     } else {

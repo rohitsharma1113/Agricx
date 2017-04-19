@@ -27,7 +27,6 @@
                     android:id="@+id/act_capture_iv_preview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:elevation="2dp"
                     android:clickable="true"
                     android:scaleType="fitCenter"
                     android:layout_gravity="center"
@@ -43,6 +42,15 @@
                     android:paddingTop="@dimen/capture_button_padding"
                     android:drawableTop="@drawable/camera"
                     android:text="@string/capture_image"/>
+
+                <ImageButton
+                    android:id="@+id/act_capture_b_retake"
+                    android:layout_width="@dimen/retake_dimen"
+                    android:layout_height="@dimen/retake_dimen"
+                    android:background="@android:color/transparent"
+                    android:scaleType="fitCenter"
+                    android:layout_gravity="right|top"
+                    android:src="@drawable/retake"/>
 
             </FrameLayout>
 

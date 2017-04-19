@@ -19,4 +19,6 @@
     <dimen name="capture_button_height">100dp</dimen>
 
     <dimen name="image_elevation">2dp</dimen>
+
+    <dimen name="retake_dimen">30dp</dimen>
 </resources>
