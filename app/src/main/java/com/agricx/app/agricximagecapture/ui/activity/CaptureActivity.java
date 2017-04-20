@@ -334,8 +334,19 @@ public class CaptureActivity extends AppCompatActivity {
                             tvImageId.setText(String.valueOf(newImageId));
                             UiUtility.showSuccessAlertDialog(thisActivity);
                         } else {
-                            fillAppropriateImageId();
-                            UiUtility.showTaskFailedDialog(thisActivity, R.string.fail_save_log_msg);
+                            (new AlertDialog.Builder(thisActivity))
+                                    .setTitle(R.string.fail_title)
+                                    .setMessage(R.string.fail_save_log_msg)
+                                    .setCancelable(false)
+                                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            fillAppropriateImageId();
+                                        }
+                                    })
+                                    .setIcon(R.drawable.cross)
+                                    .create()
+                                    .show();
                         }
                     }
                 })).execute();
