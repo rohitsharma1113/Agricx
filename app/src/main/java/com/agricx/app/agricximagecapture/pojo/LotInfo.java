@@ -16,10 +16,9 @@ public class LotInfo {
     @SerializedName("samples")
     private ArrayList<SampleInfo> sampleInfoList;
 
-    public LotInfo(String lotId, long sampleId){
+    public LotInfo(String lotId){
         this.lotId = lotId;
         this.sampleInfoList = new ArrayList<>();
-        this.sampleInfoList.add(new SampleInfo(sampleId));
     }
 
     public String getLotId() {

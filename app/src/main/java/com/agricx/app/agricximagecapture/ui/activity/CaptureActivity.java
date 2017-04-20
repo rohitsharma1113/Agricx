@@ -16,6 +16,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,6 +41,7 @@ import com.agricx.app.agricximagecapture.ui.fragment.ImagePreviewFragment;
 import com.agricx.app.agricximagecapture.utility.AppConstants;
 import com.agricx.app.agricximagecapture.utility.UiUtility;
 import com.agricx.app.agricximagecapture.utility.Utility;
+import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.IOException;
@@ -80,6 +82,7 @@ public class CaptureActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setupInitialView();
         checkPermissions();
+        Log.e("LOG", new Gson().toJson(FileStorage.getCompleteImageCollectionLog(this)));
     }
 
     private void checkPermissions(){
@@ -180,17 +183,25 @@ public class CaptureActivity extends AppCompatActivity {
             @Override
             public void onLogReadDone(ImageCollectionLog log) {
                 UiUtility.hideProgressBarAndEnableTouch(progressBar, getWindow());
-                imageCollectionLog = FileStorage.getCompleteImageCollectionLog(getApplicationContext());
-                enteredLotInfo = Utility.getLotInfoFromLotId(lotId, imageCollectionLog);
-                if (enteredLotInfo != null){
-                    ArrayList<SampleInfo> sampleInfoList = enteredLotInfo.getSampleInfoList();
-                    enteredSampleInfo = Collections.max(sampleInfoList);
-                    etSampleId.setText(String.valueOf(enteredSampleInfo.getSampleId()));
-                    ArrayList<Integer> imageIdList = enteredSampleInfo.getImageIdList();
-                    tvImageId.setText(String.valueOf(Collections.max(imageIdList) + 1));
-                } else {
+                imageCollectionLog = log;
+                if (imageCollectionLog == null){
+                    enteredLotInfo = null;
+                    enteredSampleInfo = null;
                     etSampleId.setText("1");
                     tvImageId.setText("1");
+                } else {
+                    enteredLotInfo = Utility.getLotInfoFromLotId(lotId, imageCollectionLog);
+                    if (enteredLotInfo != null){
+                        ArrayList<SampleInfo> sampleInfoList = enteredLotInfo.getSampleInfoList();
+                        enteredSampleInfo = Collections.max(sampleInfoList);
+                        etSampleId.setText(String.valueOf(enteredSampleInfo.getSampleId()));
+                        ArrayList<Integer> imageIdList = enteredSampleInfo.getImageIdList();
+                        tvImageId.setText(String.valueOf(Collections.max(imageIdList) + 1));
+                    } else {
+                        enteredSampleInfo = null;
+                        etSampleId.setText("1");
+                        tvImageId.setText("1");
+                    }
                 }
                 etSampleId.requestFocus();
             }
@@ -213,19 +224,26 @@ public class CaptureActivity extends AppCompatActivity {
             @Override
             public void onLogReadDone(ImageCollectionLog log) {
                 UiUtility.hideProgressBarAndEnableTouch(progressBar, getWindow());
-                imageCollectionLog = FileStorage.getCompleteImageCollectionLog(getApplicationContext());
-                enteredLotInfo = Utility.getLotInfoFromLotId(lotId, imageCollectionLog);
-                if (enteredLotInfo != null){
-                    ArrayList<SampleInfo> sampleInfoList = enteredLotInfo.getSampleInfoList();
-                    enteredSampleInfo = Utility.getSampleInfoFromSampleId(Long.parseLong(sampleId), sampleInfoList);
-                    if (enteredSampleInfo != null){
-                        ArrayList<Integer> imageIdList = enteredSampleInfo.getImageIdList();
-                        tvImageId.setText(String.valueOf(Collections.max(imageIdList) + 1));
+                imageCollectionLog = log;
+                if (imageCollectionLog == null){
+                    enteredLotInfo = null;
+                    enteredSampleInfo = null;
+                    tvImageId.setText("1");
+                } else {
+                    enteredLotInfo = Utility.getLotInfoFromLotId(lotId, imageCollectionLog);
+                    if (enteredLotInfo != null){
+                        ArrayList<SampleInfo> sampleInfoList = enteredLotInfo.getSampleInfoList();
+                        enteredSampleInfo = Utility.getSampleInfoFromSampleId(Long.parseLong(sampleId), sampleInfoList);
+                        if (enteredSampleInfo != null){
+                            ArrayList<Integer> imageIdList = enteredSampleInfo.getImageIdList();
+                            tvImageId.setText(String.valueOf(Collections.max(imageIdList) + 1));
+                        } else {
+                            tvImageId.setText("1");
+                        }
                     } else {
+                        enteredSampleInfo = null;
                         tvImageId.setText("1");
                     }
-                } else {
-                    tvImageId.setText("1");
                 }
                 UiUtility.closeKeyboard(getApplicationContext(), etSampleId.getWindowToken());
             }
@@ -325,12 +343,18 @@ public class CaptureActivity extends AppCompatActivity {
 
     private void saveLotInfoToCollectionLogVariable(){
         if (imageCollectionLog == null){
-            enteredLotInfo = new LotInfo(etLotId.getText().toString().trim(), Long.parseLong(etSampleId.getText().toString().trim()));
             imageCollectionLog = new ImageCollectionLog();
+
+            enteredLotInfo = new LotInfo(etLotId.getText().toString().trim());
+            enteredSampleInfo = new SampleInfo(Long.parseLong(etSampleId.getText().toString().trim()));
+            enteredLotInfo.getSampleInfoList().add(enteredSampleInfo);
+
             imageCollectionLog.getLotInfoList().add(enteredLotInfo);
         } else {
             if (enteredLotInfo == null){
-                enteredLotInfo = new LotInfo(etLotId.getText().toString().trim(), Long.parseLong(etSampleId.getText().toString().trim()));
+                enteredLotInfo = new LotInfo(etLotId.getText().toString().trim());
+                enteredSampleInfo = new SampleInfo(Long.parseLong(etSampleId.getText().toString().trim()));
+                enteredLotInfo.getSampleInfoList().add(enteredSampleInfo);
                 imageCollectionLog.getLotInfoList().add(enteredLotInfo);
             } else {
                 if (enteredSampleInfo == null){

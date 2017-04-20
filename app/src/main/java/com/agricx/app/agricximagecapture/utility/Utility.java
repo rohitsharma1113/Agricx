@@ -30,11 +30,9 @@ public class Utility {
 
     @Nullable
     public static LotInfo getLotInfoFromLotId(String lotId, ImageCollectionLog completeImageCollectionLog){
-        if (completeImageCollectionLog != null){
-            for (LotInfo lotInfo: completeImageCollectionLog.getLotInfoList()){
-                if (lotInfo.getLotId().equalsIgnoreCase(lotId)){
-                    return lotInfo;
-                }
+        for (LotInfo lotInfo: completeImageCollectionLog.getLotInfoList()){
+            if (lotInfo.getLotId().equalsIgnoreCase(lotId)){
+                return lotInfo;
             }
         }
         return null;
