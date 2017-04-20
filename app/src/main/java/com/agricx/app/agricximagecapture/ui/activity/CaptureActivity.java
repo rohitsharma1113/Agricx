@@ -3,23 +3,26 @@ package com.agricx.app.agricximagecapture.ui.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -27,11 +30,11 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.agricx.app.agricximagecapture.R;
-import com.agricx.app.agricximagecapture.data.FileStorage;
 import com.agricx.app.agricximagecapture.pojo.ImageCollectionLog;
 import com.agricx.app.agricximagecapture.pojo.LotInfo;
 import com.agricx.app.agricximagecapture.pojo.SampleInfo;
@@ -41,7 +44,6 @@ import com.agricx.app.agricximagecapture.ui.fragment.ImagePreviewFragment;
 import com.agricx.app.agricximagecapture.utility.AppConstants;
 import com.agricx.app.agricximagecapture.utility.UiUtility;
 import com.agricx.app.agricximagecapture.utility.Utility;
-import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,6 +62,8 @@ public class CaptureActivity extends AppCompatActivity {
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     public static final int REQUEST_PERMISSIONS_ALL = 100;
 
+    @BindView(R.id.content_view) View contentView;
+    @BindView(R.id.act_capture_sv) ScrollView scrollView;
     @BindView(R.id.act_capture_iv_preview) ImageView ivPreview;
     @BindView(R.id.act_capture_b_camera) Button bOpenCamera;
     @BindView(R.id.act_capture_et_lot_id) EditText etLotId;
@@ -82,7 +86,6 @@ public class CaptureActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setupInitialView();
         checkPermissions();
-        Log.e("LOG", new Gson().toJson(FileStorage.getCompleteImageCollectionLog(this)));
     }
 
     private void checkPermissions(){
@@ -128,6 +131,19 @@ public class CaptureActivity extends AppCompatActivity {
         ivPreview.setVisibility(View.GONE);
         bRetake.setVisibility(View.GONE);
         scaleUpAnimation = AnimationUtils.loadAnimation(this,R.anim.scale_up_anim);
+
+        contentView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                Rect r = new Rect();
+                contentView.getWindowVisibleDisplayFrame(r);
+                int screenHeight = contentView.getRootView().getHeight();
+                int keypadHeight = screenHeight - r.bottom;
+                if (keypadHeight > screenHeight * 0.15) {
+                    scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+                }
+            }
+        });
     }
 
     @OnClick({
@@ -165,7 +181,7 @@ public class CaptureActivity extends AppCompatActivity {
         if (capturedImageUri != null){
             FragmentManager fm = getSupportFragmentManager();
             ImagePreviewFragment imagePreviewFragment = ImagePreviewFragment.getInstance(capturedImageUri);
-            imagePreviewFragment.show(fm, "");
+            imagePreviewFragment.show(fm, AppConstants.DIALOG_FRAGMENT_TAG);
         } else {
             Toast.makeText(this, R.string.image_uri_not_found, Toast.LENGTH_SHORT).show();
         }
@@ -411,18 +427,25 @@ public class CaptureActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+    public void onBackPressed() {
+        DialogFragment dialogFragment = (DialogFragment) getSupportFragmentManager().findFragmentByTag(AppConstants.DIALOG_FRAGMENT_TAG);
+        if(dialogFragment!=null &&  dialogFragment.getDialog()!=null && dialogFragment.getDialog().isShowing()) {
+            dialogFragment.getDialog().dismiss();
+        } else {
+            (new AlertDialog.Builder(thisActivity))
+                    .setTitle(R.string.confirmation)
+                    .setMessage(R.string.sure_exit)
+                    .setCancelable(false)
+                    .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                            CaptureActivity.super.onBackPressed();
+                        }
+                    })
+                    .setNegativeButton(R.string.no, null)
+                    .create()
+                    .show();
         }
-
-        return super.onOptionsItemSelected(item);
     }
 }

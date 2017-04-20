@@ -27,8 +27,15 @@
     <string name="fail_title">Failed</string>
     <string name="fail_msg">Failed to save image log. This may be a memory issue. Please check and restart the app after closing this box.</string>
     <string name="ok">OK</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="confirmation">Confirm Exit</string>
+    <string name="sure_exit">Are you sure you want to exit?</string>
 
     <string name="enter_lot_id">Enter Lot ID</string>
     <string name="enter_sample_id">Enter Sample ID</string>
     <string name="enter_image_id">Enter Image ID</string>
+
+    <string name="input_lot_id" translatable="false">qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890</string>
+    <string name="input_sample_id" translatable="false">123456789</string>
 </resources>

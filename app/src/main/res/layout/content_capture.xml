@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
+    android:id="@+id/act_capture_sv"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.agricx.app.agricximagecapture.ui.activity.CaptureActivity"
     tools:showIn="@layout/activity_capture">
@@ -70,7 +71,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/lot_id"
-                        android:inputType="text"/>
+                        android:inputType="text|textNoSuggestions"
+                        android:digits="@string/input_lot_id"
+                        android:maxLength="@integer/max_len_lot_id"/>
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -101,7 +104,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/sample_id"
-                        android:inputType="number"/>
+                        android:inputType="number"
+                        android:digits="@string/input_sample_id"
+                        android:maxLength="@integer/max_len_sample_id"/>
 
                 </android.support.design.widget.TextInputLayout>
 

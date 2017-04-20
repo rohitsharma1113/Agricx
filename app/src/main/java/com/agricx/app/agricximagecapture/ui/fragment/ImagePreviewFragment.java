@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 
 public class ImagePreviewFragment extends DialogFragment {
@@ -50,6 +51,12 @@ public class ImagePreviewFragment extends DialogFragment {
         ButterKnife.bind(this, rootView);
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
         showImage();
+        rootView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getDialog().dismiss();
+            }
+        });
         return rootView;
     }
 

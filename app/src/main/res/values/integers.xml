@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <integer name="max_len_lot_id">8</integer>
+    <integer name="max_len_sample_id">1</integer>
+
+</resources>

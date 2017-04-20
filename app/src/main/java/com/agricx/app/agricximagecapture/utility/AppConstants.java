@@ -13,4 +13,5 @@ public class AppConstants {
 
     public static final String TEMP_IMAGE_NAME = "temp.jpg";
     public static final String ARICX_IMAGES_FOLDER_NAME = "agricx";
+    public static final String DIALOG_FRAGMENT_TAG = "dialog_tag";
 }
