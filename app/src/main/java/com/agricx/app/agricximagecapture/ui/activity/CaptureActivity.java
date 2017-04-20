@@ -35,7 +35,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.agricx.app.agricximagecapture.R;
+import com.agricx.app.agricximagecapture.data.PreferenceStorage;
 import com.agricx.app.agricximagecapture.pojo.ImageCollectionLog;
+import com.agricx.app.agricximagecapture.pojo.LastEnteredInfo;
 import com.agricx.app.agricximagecapture.pojo.LotInfo;
 import com.agricx.app.agricximagecapture.pojo.SampleInfo;
 import com.agricx.app.agricximagecapture.ui.LogReaderTask;
@@ -61,9 +63,7 @@ public class CaptureActivity extends AppCompatActivity {
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     public static final int REQUEST_PERMISSIONS_ALL = 100;
-
-    @BindView(R.id.content_view) View contentView;
-    @BindView(R.id.act_capture_sv) ScrollView scrollView;
+    
     @BindView(R.id.act_capture_iv_preview) ImageView ivPreview;
     @BindView(R.id.act_capture_b_camera) Button bOpenCamera;
     @BindView(R.id.act_capture_et_lot_id) EditText etLotId;
@@ -130,20 +130,8 @@ public class CaptureActivity extends AppCompatActivity {
         progressBar.setVisibility(View.GONE);
         ivPreview.setVisibility(View.GONE);
         bRetake.setVisibility(View.GONE);
+        fillLastSavedDetails();
         scaleUpAnimation = AnimationUtils.loadAnimation(this,R.anim.scale_up_anim);
-
-        contentView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                Rect r = new Rect();
-                contentView.getWindowVisibleDisplayFrame(r);
-                int screenHeight = contentView.getRootView().getHeight();
-                int keypadHeight = screenHeight - r.bottom;
-                if (keypadHeight > screenHeight * 0.15) {
-                    scrollView.fullScroll(ScrollView.FOCUS_DOWN);
-                }
-            }
-        });
     }
 
     @OnClick({
@@ -349,6 +337,7 @@ public class CaptureActivity extends AppCompatActivity {
                             prepareNewCapture();
                             int newImageId = Integer.parseInt(imageId) + 1;
                             tvImageId.setText(String.valueOf(newImageId));
+                            saveDetails();
                             UiUtility.showSuccessAlertDialog(thisActivity);
                         } else {
                             UiUtility.showLogSaveFailedDialog(thisActivity);
@@ -450,6 +439,23 @@ public class CaptureActivity extends AppCompatActivity {
                     .setNegativeButton(R.string.no, null)
                     .create()
                     .show();
+        }
+    }
+
+    private void saveDetails(){
+        LastEnteredInfo lastEnteredInfo = new LastEnteredInfo();
+        lastEnteredInfo.setLotId(etLotId.getText().toString().trim());
+        lastEnteredInfo.setSampleId(Long.parseLong(etSampleId.getText().toString().trim()));
+        lastEnteredInfo.setImageId(Long.parseLong(tvImageId.getText().toString().trim()));
+        PreferenceStorage.saveLastEnteredInfo(thisActivity, lastEnteredInfo);
+    }
+
+    private void fillLastSavedDetails(){
+        LastEnteredInfo lastEnteredInfo = PreferenceStorage.getLastEnteredInfo(thisActivity);
+        if (lastEnteredInfo != null){
+            etLotId.setText(lastEnteredInfo.getLotId());
+            etSampleId.setText(String.valueOf(lastEnteredInfo.getSampleId()));
+            tvImageId.setText(String.valueOf(lastEnteredInfo.getImageId()));
         }
     }
 }
