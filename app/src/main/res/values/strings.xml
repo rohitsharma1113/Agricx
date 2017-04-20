@@ -8,15 +8,15 @@
     <string name="image_id">Image ID</string>
     <string name="save_and_next">Save and Next</string>
     <string name="could_not_open_camera">Could not open camera</string>
-    <string name="could_not_capture">Could not capture new image</string>
+    <string name="could_not_capture">Could not capture new image. Please try again. Check internal memory space if issue persists.</string>
     <string name="please_capture_image">Please capture an image</string>
     <string name="external_storage_not_writable">External storage not writable</string>
-    <string name="failed_directory_creation">Failed to create images folder</string>
+    <string name="failed_directory_creation">Failed to create images folder. Please try again. Check internal memory space if issue persists.</string>
     <string name="image_save_success">Image Saved Successfully</string>
     <string name="image_log_save_failed">Failed To Save Image Log. App Will be restarted</string>
     <string name="image_id_missing">Image ID missing</string>
     <string name="sample_id_missing">Sample ID missing</string>
-    <string name="could_not_create_image_file">Could not create image file</string>
+    <string name="could_not_create_image_file">Could not create image file. Please try again. Check internal memory space if issue persists.</string>
     <string name="rename_failed">Failed to rename image</string>
     <string name="temp_file_does_not_exist">Temporary image file does not exist</string>
     <string name="file_already_exits">Image with the given name already exits</string>
@@ -25,13 +25,13 @@
     <string name="success_title">Success</string>
     <string name="success_msg">Image has been saved successfully. Image counter will be updated automatically.</string>
     <string name="fail_title">Failed</string>
-    <string name="fail_msg">Failed to save image log. This may be a memory issue. Please check and restart the app after closing this box.</string>
+    <string name="fail_save_log_msg">Failed to save image log. Please try again. Check internal memory space if issue persists.</string>
     <string name="ok">OK</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="confirmation">Confirm Exit</string>
     <string name="sure_exit">Are you sure you want to exit?</string>
-    <string name="fail_image_capture">Image URI not found. Please capture the image again.</string>
+    <string name="temp_image_file_not_found">Image file not found. Please capture the image again. Check internal memory space if issue persists.</string>
 
     <string name="enter_lot_id">Enter Lot ID</string>
     <string name="enter_sample_id">Enter Sample ID</string>

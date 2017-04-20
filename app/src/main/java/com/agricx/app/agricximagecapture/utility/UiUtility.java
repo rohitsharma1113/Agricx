@@ -61,27 +61,10 @@ public class UiUtility {
                 .show();
     }
 
-    public static void showLogSaveFailedDialog(final Activity activity){
+    public static void showTaskFailedDialog(Activity activity, @StringRes int message){
         (new AlertDialog.Builder(activity))
                 .setTitle(R.string.fail_title)
-                .setMessage(R.string.fail_msg)
-                .setCancelable(false)
-                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                        activity.finishAffinity();
-                    }
-                })
-                .setIcon(R.drawable.cross)
-                .create()
-                .show();
-    }
-
-    public static void showImageUriNotFoundDialog(Activity activity){
-        (new AlertDialog.Builder(activity))
-                .setTitle(R.string.fail_title)
-                .setMessage(R.string.fail_image_capture)
+                .setMessage(message)
                 .setCancelable(false)
                 .setPositiveButton(R.string.ok, null)
                 .setIcon(R.drawable.cross)

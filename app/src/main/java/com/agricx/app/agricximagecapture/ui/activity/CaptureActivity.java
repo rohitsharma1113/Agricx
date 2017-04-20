@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,14 +14,12 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -30,7 +27,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -130,7 +126,6 @@ public class CaptureActivity extends AppCompatActivity {
         progressBar.setVisibility(View.GONE);
         ivPreview.setVisibility(View.GONE);
         bRetake.setVisibility(View.GONE);
-        fillLastSavedDetails();
         scaleUpAnimation = AnimationUtils.loadAnimation(this,R.anim.scale_up_anim);
     }
 
@@ -262,7 +257,7 @@ public class CaptureActivity extends AppCompatActivity {
         File myDir = Utility.getAgricxImagesFolderName();
         if (!myDir.exists()){
             if (!myDir.mkdirs()){
-                Toast.makeText(this, getString(R.string.failed_directory_creation), Toast.LENGTH_SHORT).show();
+                UiUtility.showTaskFailedDialog(thisActivity, R.string.failed_directory_creation);
                 return null;
             }
         }
@@ -276,7 +271,7 @@ public class CaptureActivity extends AppCompatActivity {
             try {
                 photoFile = createTempImageFile();
             } catch (IOException ex) {
-                Toast.makeText(this, getString(R.string.could_not_create_image_file), Toast.LENGTH_SHORT).show();
+                UiUtility.showTaskFailedDialog(thisActivity, R.string.could_not_create_image_file);
                 return;
             }
 
@@ -285,7 +280,7 @@ public class CaptureActivity extends AppCompatActivity {
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoFileUri);
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             } else {
-                Toast.makeText(this, getString(R.string.could_not_create_image_file), Toast.LENGTH_SHORT).show();
+                UiUtility.showTaskFailedDialog(thisActivity, R.string.could_not_create_image_file);
             }
         } else {
             Toast.makeText(this, getString(R.string.could_not_open_camera), Toast.LENGTH_SHORT).show();
@@ -337,10 +332,10 @@ public class CaptureActivity extends AppCompatActivity {
                             prepareNewCapture();
                             int newImageId = Integer.parseInt(imageId) + 1;
                             tvImageId.setText(String.valueOf(newImageId));
-                            saveDetails();
                             UiUtility.showSuccessAlertDialog(thisActivity);
                         } else {
-                            UiUtility.showLogSaveFailedDialog(thisActivity);
+                            fillAppropriateImageId();
+                            UiUtility.showTaskFailedDialog(thisActivity, R.string.fail_save_log_msg);
                         }
                     }
                 })).execute();
@@ -397,7 +392,7 @@ public class CaptureActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK){
                 File tempFile = new File(Utility.getAgricxImagesFolderName(), AppConstants.TEMP_IMAGE_NAME);
                 if (!tempFile.exists()){
-                    UiUtility.showImageUriNotFoundDialog(thisActivity);
+                    UiUtility.showTaskFailedDialog(thisActivity, R.string.temp_image_file_not_found);
                     return;
                 }
                 capturedImageUri = Uri.fromFile(tempFile);
@@ -409,11 +404,11 @@ public class CaptureActivity extends AppCompatActivity {
                         ivPreview.setImageBitmap(capturedImageBitmap);
                         bOpenCamera.setVisibility(View.GONE);
                     } else {
-                        Toast.makeText(this, getString(R.string.could_not_capture), Toast.LENGTH_SHORT).show();
+                        UiUtility.showTaskFailedDialog(thisActivity, R.string.could_not_capture);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(this, getString(R.string.could_not_capture), Toast.LENGTH_SHORT).show();
+                    UiUtility.showTaskFailedDialog(thisActivity, R.string.could_not_capture);
                 }
             }
         }
