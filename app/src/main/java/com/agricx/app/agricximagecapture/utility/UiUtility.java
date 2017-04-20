@@ -78,6 +78,17 @@ public class UiUtility {
                 .show();
     }
 
+    public static void showImageUriNotFoundDialog(Activity activity){
+        (new AlertDialog.Builder(activity))
+                .setTitle(R.string.fail_title)
+                .setMessage(R.string.fail_image_capture)
+                .setCancelable(false)
+                .setPositiveButton(R.string.ok, null)
+                .setIcon(R.drawable.cross)
+                .create()
+                .show();
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public static void hideAnim(final View view){
         int cx = view.getWidth()/2;

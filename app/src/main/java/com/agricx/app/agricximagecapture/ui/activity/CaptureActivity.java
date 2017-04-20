@@ -267,6 +267,10 @@ public class CaptureActivity extends AppCompatActivity {
     }
 
     private File createTempImageFile() throws IOException{
+        if (!Utility.isExternalStorageWritable()){
+            Toast.makeText(this, getString(R.string.external_storage_not_writable), Toast.LENGTH_SHORT).show();
+            return null;
+        }
         File myDir = Utility.getAgricxImagesFolderName();
         if (!myDir.exists()){
             if (!myDir.mkdirs()){
@@ -404,7 +408,7 @@ public class CaptureActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK){
                 File tempFile = new File(Utility.getAgricxImagesFolderName(), AppConstants.TEMP_IMAGE_NAME);
                 if (!tempFile.exists()){
-                    Toast.makeText(this, getString(R.string.image_uri_not_found), Toast.LENGTH_SHORT).show();
+                    UiUtility.showImageUriNotFoundDialog(thisActivity);
                     return;
                 }
                 capturedImageUri = Uri.fromFile(tempFile);
