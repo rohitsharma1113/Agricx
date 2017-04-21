@@ -220,7 +220,7 @@ public class CaptureActivity extends AppCompatActivity {
         }
 
         UiUtility.showProgressBarAndDisableTouch(progressBar, getWindow());
-        (new LogReaderTask(this, new LogReaderTask.LogReadDoneListener() {
+        (new LogReaderTask(getApplicationContext(), new LogReaderTask.LogReadDoneListener() {
             @Override
             public void onLogReadDone(ImageCollectionLog log) {
                 UiUtility.hideProgressBarAndEnableTouch(progressBar, getWindow());
