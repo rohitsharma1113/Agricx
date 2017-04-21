@@ -5,6 +5,10 @@ import android.os.AsyncTask;
 
 import com.agricx.app.agricximagecapture.data.FileStorage;
 import com.agricx.app.agricximagecapture.pojo.ImageCollectionLog;
+import com.agricx.app.agricximagecapture.utility.UiUtility;
+import com.agricx.app.agricximagecapture.utility.Utility;
+
+import java.io.File;
 
 /**
  * Created by rohit on 19/4/17.
@@ -19,16 +23,22 @@ public class LogSaverTask extends AsyncTask<Void, Void, Boolean> {
     private ImageCollectionLog log;
     private Context context;
     private LogSaveDoneListener logSaveDoneListener;
+    private File imageFile;
 
-    public LogSaverTask(Context context, ImageCollectionLog log, LogSaveDoneListener logSaveDoneListener){
+    public LogSaverTask(Context context, ImageCollectionLog log, File imageFile, LogSaveDoneListener logSaveDoneListener){
         this.context = context;
         this.log = log;
         this.logSaveDoneListener = logSaveDoneListener;
+        this.imageFile = imageFile;
     }
 
     @Override
     protected Boolean doInBackground(Void... voids) {
-        return FileStorage.saveCompleteImageCollectionLog(context, log);
+        boolean saveStatus = FileStorage.saveCompleteImageCollectionLog(context, log);
+        if (saveStatus){
+            Utility.performFileScan(context, imageFile.toString());
+        }
+        return saveStatus;
     }
 
     @Override

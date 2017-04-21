@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -85,7 +86,7 @@ public class CaptureActivity extends AppCompatActivity {
     }
 
     private void checkPermissions(){
-        String[] PERMISSIONS = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        String[] PERMISSIONS = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE};
         if(!hasPermissions(this, PERMISSIONS)){
             ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_PERMISSIONS_ALL);
         }
@@ -320,18 +321,20 @@ public class CaptureActivity extends AppCompatActivity {
         } else {
             File myDir = Utility.getAgricxImagesFolderName();
             File tempPhotoFile = new File(myDir, AppConstants.TEMP_IMAGE_NAME);
-            String renamedPhotoName = (new StringBuilder()).append(lotId).append("_").append(sampleId).append("_").append(imageId).append(".jpg").toString();
+            String renamedPhotoName = (new StringBuilder()).append(lotId).append("_").append(sampleId).append("_")
+                    .append(imageId).append("_").append(Utility.getDeviceImei(thisActivity)).append(".jpg").toString();
             File finalPhotoFile = new File(myDir, renamedPhotoName);
             if (tempPhotoFile.renameTo(finalPhotoFile)){
                 saveLotInfoToCollectionLogVariable();
-                (new LogSaverTask(this, imageCollectionLog, new LogSaverTask.LogSaveDoneListener() {
+                UiUtility.showProgressBarAndDisableTouch(progressBar, getWindow());
+                (new LogSaverTask(this, imageCollectionLog, finalPhotoFile, new LogSaverTask.LogSaveDoneListener() {
                     @Override
                     public void onLogSaveDone(Boolean saved) {
                         UiUtility.hideProgressBarAndEnableTouch(progressBar, getWindow());
                         if (saved){
-                            prepareNewCapture();
                             int newImageId = Integer.parseInt(imageId) + 1;
                             tvImageId.setText(String.valueOf(newImageId));
+                            prepareNewCapture();
                             UiUtility.showSuccessAlertDialog(thisActivity);
                         } else {
                             (new AlertDialog.Builder(thisActivity))

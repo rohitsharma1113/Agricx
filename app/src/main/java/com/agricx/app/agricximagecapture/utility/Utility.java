@@ -1,8 +1,11 @@
 package com.agricx.app.agricximagecapture.utility;
 
 import android.content.Context;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.telephony.TelephonyManager;
 
 import com.agricx.app.agricximagecapture.data.FileStorage;
 import com.agricx.app.agricximagecapture.pojo.ImageCollectionLog;
@@ -13,6 +16,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+
+import static android.content.Context.TELEPHONY_SERVICE;
 
 /**
  * Created by rohit on 17/4/17.
@@ -52,4 +57,18 @@ public class Utility {
         return new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
                 AppConstants.ARICX_IMAGES_FOLDER_NAME);
     }
+
+    public static String getDeviceImei(Context context){
+        TelephonyManager manager = (TelephonyManager) context.getSystemService(TELEPHONY_SERVICE);
+        return manager.getDeviceId();
+    }
+
+    public static void performFileScan(Context context, String filePath){
+        MediaScannerConnection.scanFile(context, new String[] { filePath }, null,
+                new MediaScannerConnection.OnScanCompletedListener() {
+                    public void onScanCompleted(String path, Uri uri) {
+                    }
+                });
+    }
+
 }
