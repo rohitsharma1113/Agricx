@@ -179,7 +179,7 @@ public class CaptureActivity extends AppCompatActivity {
         }
 
         UiUtility.showProgressBarAndDisableTouch(progressBar, getWindow());
-        (new LogReaderTask(this, new LogReaderTask.LogReadDoneListener() {
+        (new LogReaderTask(getApplicationContext(), new LogReaderTask.LogReadDoneListener() {
             @Override
             public void onLogReadDone(ImageCollectionLog log) {
                 UiUtility.hideProgressBarAndEnableTouch(progressBar, getWindow());
@@ -327,7 +327,7 @@ public class CaptureActivity extends AppCompatActivity {
             if (tempPhotoFile.renameTo(finalPhotoFile)){
                 saveLotInfoToCollectionLogVariable();
                 UiUtility.showProgressBarAndDisableTouch(progressBar, getWindow());
-                (new LogSaverTask(this, imageCollectionLog, finalPhotoFile, new LogSaverTask.LogSaveDoneListener() {
+                (new LogSaverTask(getApplicationContext(), imageCollectionLog, finalPhotoFile, new LogSaverTask.LogSaveDoneListener() {
                     @Override
                     public void onLogSaveDone(Boolean saved) {
                         UiUtility.hideProgressBarAndEnableTouch(progressBar, getWindow());

@@ -7,6 +7,14 @@ repositories {
 
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'key_alias'
+            keyPassword 'qwertyuiop'
+            storeFile file('keystore/keystore.jks')
+            storePassword 'qwertyuiop'
+        }
+    }
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
@@ -21,12 +29,13 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
     }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
