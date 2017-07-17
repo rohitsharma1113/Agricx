@@ -654,16 +654,20 @@ public class MainUI {
 			    View exposureLockButton = main_activity.findViewById(R.id.exposure_lock);
 			    View audioControlButton = main_activity.findViewById(R.id.audio_control);
 			    View popupButton = main_activity.findViewById(R.id.popup);
+				View takePhotoButton = main_activity.findViewById(R.id.take_photo);
+				View zoomSeekBar = main_activity.findViewById(R.id.zoom_seekbar);
+				zoomSeekBar.setVisibility(View.GONE);
+				takePhotoButton.setVisibility(View.VISIBLE);
 			    if( main_activity.getPreview().getCameraControllerManager().getNumberOfCameras() > 1 )
-			    	switchCameraButton.setVisibility(visibility);
+			    	switchCameraButton.setVisibility(View.GONE);
 			    if( !main_activity.getPreview().isVideo() )
-			    	switchVideoButton.setVisibility(visibility); // still allow switch video when recording video
+			    	switchVideoButton.setVisibility(View.GONE); // still allow switch video when recording video
 			    if( main_activity.supportsExposureButton() && !main_activity.getPreview().isVideo() ) // still allow exposure when recording video
 			    	exposureButton.setVisibility(visibility);
 			    if( main_activity.getPreview().supportsExposureLock() && !main_activity.getPreview().isVideo() ) // still allow exposure lock when recording video
 			    	exposureLockButton.setVisibility(visibility);
 			    if( main_activity.hasAudioControl() )
-			    	audioControlButton.setVisibility(visibility);
+			    	audioControlButton.setVisibility(View.GONE);
 			    if( !show ) {
 			    	closePopup(); // we still allow the popup when recording video, but need to update the UI (so it only shows flash options), so easiest to just close
 			    }

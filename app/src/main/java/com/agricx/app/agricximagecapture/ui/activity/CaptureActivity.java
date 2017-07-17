@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -61,15 +60,23 @@ public class CaptureActivity extends AppCompatActivity {
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     public static final int REQUEST_PERMISSIONS_ALL = 100;
-    
-    @BindView(R.id.act_capture_iv_preview) ImageView ivPreview;
-    @BindView(R.id.act_capture_b_camera) Button bOpenCamera;
-    @BindView(R.id.act_capture_et_lot_id) EditText etLotId;
-    @BindView(R.id.act_capture_et_sample_id) EditText etSampleId;
-    @BindView(R.id.act_capture_tv_image_id) TextView tvImageId;
-    @BindView(R.id.act_capture_b_save_next) Button bSaveAndNext;
-    @BindView(R.id.progressBar) ProgressBar progressBar;
-    @BindView(R.id.act_capture_b_retake) ImageButton bRetake;
+
+    @BindView(R.id.act_capture_iv_preview)
+    ImageView ivPreview;
+    @BindView(R.id.act_capture_b_camera)
+    Button bOpenCamera;
+    @BindView(R.id.act_capture_et_lot_id)
+    EditText etLotId;
+    @BindView(R.id.act_capture_et_sample_id)
+    EditText etSampleId;
+    @BindView(R.id.act_capture_tv_image_id)
+    TextView tvImageId;
+    @BindView(R.id.act_capture_b_save_next)
+    Button bSaveAndNext;
+    @BindView(R.id.progressBar)
+    ProgressBar progressBar;
+    @BindView(R.id.act_capture_b_retake)
+    ImageButton bRetake;
 
     private Bitmap capturedImageBitmap;
     private Uri capturedImageUri;
@@ -86,9 +93,9 @@ public class CaptureActivity extends AppCompatActivity {
         checkPermissions();
     }
 
-    private void checkPermissions(){
+    private void checkPermissions() {
         String[] PERMISSIONS = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE};
-        if(!hasPermissions(this, PERMISSIONS)){
+        if (!hasPermissions(this, PERMISSIONS)) {
             ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_PERMISSIONS_ALL);
         }
     }
@@ -106,10 +113,10 @@ public class CaptureActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_PERMISSIONS_ALL){
+        if (requestCode == REQUEST_PERMISSIONS_ALL) {
             if (grantResults.length > 0) {
-                for (int i = 0; i<permissions.length; i++){
-                    if (grantResults[i] != PackageManager.PERMISSION_GRANTED){
+                for (int i = 0; i < permissions.length; i++) {
+                    if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
                         finish();
                     }
                 }
@@ -119,7 +126,7 @@ public class CaptureActivity extends AppCompatActivity {
         }
     }
 
-    private void setupInitialView(){
+    private void setupInitialView() {
         setContentView(R.layout.activity_capture);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -128,7 +135,7 @@ public class CaptureActivity extends AppCompatActivity {
         progressBar.setVisibility(View.GONE);
         ivPreview.setVisibility(View.GONE);
         bRetake.setVisibility(View.GONE);
-        scaleUpAnimation = AnimationUtils.loadAnimation(this,R.anim.scale_up_anim);
+        scaleUpAnimation = AnimationUtils.loadAnimation(this, R.anim.scale_up_anim);
     }
 
     @OnClick({
@@ -139,9 +146,9 @@ public class CaptureActivity extends AppCompatActivity {
             R.id.act_capture_iv_preview,
             R.id.act_capture_b_retake
     })
-    void onClick(View view){
+    void onClick(View view) {
         int id = view.getId();
-        switch (id){
+        switch (id) {
             case R.id.act_capture_b_camera:
                 startActivityForResult(new Intent(getApplicationContext(), MainActivity.class), REQUEST_IMAGE_CAPTURE);
 //                startActivity(new Intent(getApplicationContext(), MainActivity.class));
@@ -164,8 +171,8 @@ public class CaptureActivity extends AppCompatActivity {
         }
     }
 
-    private void openPreviewDialog(){
-        if (capturedImageUri != null){
+    private void openPreviewDialog() {
+        if (capturedImageUri != null) {
             FragmentManager fm = getSupportFragmentManager();
             ImagePreviewFragment imagePreviewFragment = ImagePreviewFragment.getInstance(capturedImageUri);
             imagePreviewFragment.show(fm, AppConstants.DIALOG_FRAGMENT_TAG);
@@ -174,9 +181,9 @@ public class CaptureActivity extends AppCompatActivity {
         }
     }
 
-    private void fillAppropriateSampleAndImageId(){
+    private void fillAppropriateSampleAndImageId() {
         final String lotId = etLotId.getText().toString().trim();
-        if (lotId.length() == 0){
+        if (lotId.length() == 0) {
             Toast.makeText(this, getString(R.string.enter_lot_id), Toast.LENGTH_SHORT).show();
             return;
         }
@@ -187,14 +194,14 @@ public class CaptureActivity extends AppCompatActivity {
             public void onLogReadDone(ImageCollectionLog log) {
                 UiUtility.hideProgressBarAndEnableTouch(progressBar, getWindow());
                 imageCollectionLog = log;
-                if (imageCollectionLog == null){
+                if (imageCollectionLog == null) {
                     enteredLotInfo = null;
                     enteredSampleInfo = null;
                     etSampleId.setText("1");
                     tvImageId.setText("1");
                 } else {
                     enteredLotInfo = Utility.getLotInfoFromLotId(lotId, imageCollectionLog);
-                    if (enteredLotInfo != null){
+                    if (enteredLotInfo != null) {
                         ArrayList<SampleInfo> sampleInfoList = enteredLotInfo.getSampleInfoList();
                         enteredSampleInfo = Collections.max(sampleInfoList);
                         etSampleId.setText(String.valueOf(enteredSampleInfo.getSampleId()));
@@ -211,13 +218,13 @@ public class CaptureActivity extends AppCompatActivity {
         })).execute();
     }
 
-    private void fillAppropriateImageId(){
+    private void fillAppropriateImageId() {
         final String lotId = etLotId.getText().toString().trim();
         final String sampleId = etSampleId.getText().toString().trim();
-        if (lotId.length() == 0){
+        if (lotId.length() == 0) {
             Toast.makeText(this, getString(R.string.enter_lot_id), Toast.LENGTH_SHORT).show();
             return;
-        } else if (sampleId.length() == 0){
+        } else if (sampleId.length() == 0) {
             Toast.makeText(this, getString(R.string.enter_sample_id), Toast.LENGTH_SHORT).show();
             return;
         }
@@ -228,16 +235,16 @@ public class CaptureActivity extends AppCompatActivity {
             public void onLogReadDone(ImageCollectionLog log) {
                 UiUtility.hideProgressBarAndEnableTouch(progressBar, getWindow());
                 imageCollectionLog = log;
-                if (imageCollectionLog == null){
+                if (imageCollectionLog == null) {
                     enteredLotInfo = null;
                     enteredSampleInfo = null;
                     tvImageId.setText("1");
                 } else {
                     enteredLotInfo = Utility.getLotInfoFromLotId(lotId, imageCollectionLog);
-                    if (enteredLotInfo != null){
+                    if (enteredLotInfo != null) {
                         ArrayList<SampleInfo> sampleInfoList = enteredLotInfo.getSampleInfoList();
                         enteredSampleInfo = Utility.getSampleInfoFromSampleId(Long.parseLong(sampleId), sampleInfoList);
-                        if (enteredSampleInfo != null){
+                        if (enteredSampleInfo != null) {
                             ArrayList<Integer> imageIdList = enteredSampleInfo.getImageIdList();
                             tvImageId.setText(String.valueOf(Collections.max(imageIdList) + 1));
                         } else {
@@ -253,14 +260,14 @@ public class CaptureActivity extends AppCompatActivity {
         })).execute();
     }
 
-    private File createTempImageFile() throws IOException{
-        if (!Utility.isExternalStorageWritable()){
+    private File createTempImageFile() throws IOException {
+        if (!Utility.isExternalStorageWritable()) {
             Toast.makeText(this, getString(R.string.external_storage_not_writable), Toast.LENGTH_SHORT).show();
             return null;
         }
         File myDir = Utility.getAgricxImagesFolderName();
-        if (!myDir.exists()){
-            if (!myDir.mkdirs()){
+        if (!myDir.exists()) {
+            if (!myDir.mkdirs()) {
                 UiUtility.showTaskFailedDialog(thisActivity, R.string.failed_directory_creation);
                 return null;
             }
@@ -270,7 +277,7 @@ public class CaptureActivity extends AppCompatActivity {
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) !=  null) {
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             File photoFile;
             try {
                 photoFile = createTempImageFile();
@@ -279,7 +286,7 @@ public class CaptureActivity extends AppCompatActivity {
                 return;
             }
 
-            if (photoFile != null){
+            if (photoFile != null) {
                 Uri photoFileUri = Uri.fromFile(photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoFileUri);
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
@@ -292,34 +299,34 @@ public class CaptureActivity extends AppCompatActivity {
     }
 
     @OnTextChanged(value = R.id.act_capture_et_lot_id, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
-    void onLotIdChanged(){
-        if (getCurrentFocus() == etLotId){
+    void onLotIdChanged() {
+        if (getCurrentFocus() == etLotId) {
             etSampleId.setText("");
             tvImageId.setText("");
         }
     }
 
     @OnTextChanged(value = R.id.act_capture_et_sample_id, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
-    void onSampleIdChanged(){
-        if (getCurrentFocus() == etSampleId){
+    void onSampleIdChanged() {
+        if (getCurrentFocus() == etSampleId) {
             tvImageId.setText("");
         }
     }
 
-    private void saveImageToSdCard(){
+    private void saveImageToSdCard() {
         String lotId = etLotId.getText().toString().trim();
         String sampleId = etSampleId.getText().toString().trim();
         final String imageId = tvImageId.getText().toString().trim();
 
-        if (capturedImageBitmap == null){
+        if (capturedImageBitmap == null) {
             Toast.makeText(this, getString(R.string.please_capture_image), Toast.LENGTH_SHORT).show();
-        } else if (lotId.length() == 0){
+        } else if (lotId.length() == 0) {
             Toast.makeText(this, getString(R.string.enter_lot_id), Toast.LENGTH_SHORT).show();
-        } else if (sampleId.length() == 0){
+        } else if (sampleId.length() == 0) {
             Toast.makeText(this, getString(R.string.sample_id_missing), Toast.LENGTH_SHORT).show();
-        } else if (imageId.length() == 0){
+        } else if (imageId.length() == 0) {
             Toast.makeText(this, getString(R.string.image_id_missing), Toast.LENGTH_SHORT).show();
-        } else if (!Utility.isExternalStorageWritable()){
+        } else if (!Utility.isExternalStorageWritable()) {
             Toast.makeText(this, getString(R.string.external_storage_not_writable), Toast.LENGTH_SHORT).show();
         } else {
             File myDir = Utility.getAgricxImagesFolderName();
@@ -327,14 +334,14 @@ public class CaptureActivity extends AppCompatActivity {
             String renamedPhotoName = (new StringBuilder()).append(lotId).append("_").append(sampleId).append("_")
                     .append(imageId).append("_").append(Utility.getDeviceImei(thisActivity)).append(".jpg").toString();
             File finalPhotoFile = new File(myDir, renamedPhotoName);
-            if (tempPhotoFile.renameTo(finalPhotoFile)){
+            if (tempPhotoFile.renameTo(finalPhotoFile)) {
                 saveLotInfoToCollectionLogVariable();
                 UiUtility.showProgressBarAndDisableTouch(progressBar, getWindow());
                 (new LogSaverTask(getApplicationContext(), imageCollectionLog, finalPhotoFile, new LogSaverTask.LogSaveDoneListener() {
                     @Override
                     public void onLogSaveDone(Boolean saved) {
                         UiUtility.hideProgressBarAndEnableTouch(progressBar, getWindow());
-                        if (saved){
+                        if (saved) {
                             int newImageId = Integer.parseInt(imageId) + 1;
                             tvImageId.setText(String.valueOf(newImageId));
                             prepareNewCapture();
@@ -362,8 +369,8 @@ public class CaptureActivity extends AppCompatActivity {
         }
     }
 
-    private void saveLotInfoToCollectionLogVariable(){
-        if (imageCollectionLog == null){
+    private void saveLotInfoToCollectionLogVariable() {
+        if (imageCollectionLog == null) {
             imageCollectionLog = new ImageCollectionLog();
 
             enteredLotInfo = new LotInfo(etLotId.getText().toString().trim());
@@ -372,13 +379,13 @@ public class CaptureActivity extends AppCompatActivity {
 
             imageCollectionLog.getLotInfoList().add(enteredLotInfo);
         } else {
-            if (enteredLotInfo == null){
+            if (enteredLotInfo == null) {
                 enteredLotInfo = new LotInfo(etLotId.getText().toString().trim());
                 enteredSampleInfo = new SampleInfo(Long.parseLong(etSampleId.getText().toString().trim()));
                 enteredLotInfo.getSampleInfoList().add(enteredSampleInfo);
                 imageCollectionLog.getLotInfoList().add(enteredLotInfo);
             } else {
-                if (enteredSampleInfo == null){
+                if (enteredSampleInfo == null) {
                     enteredSampleInfo = new SampleInfo(Long.parseLong(etSampleId.getText().toString().trim()));
                     enteredLotInfo.getSampleInfoList().add(enteredSampleInfo);
                 } else {
@@ -388,7 +395,7 @@ public class CaptureActivity extends AppCompatActivity {
         }
     }
 
-    private void prepareNewCapture(){
+    private void prepareNewCapture() {
         capturedImageUri = null;
         capturedImageBitmap = null;
         bOpenCamera.setVisibility(View.VISIBLE);
@@ -405,17 +412,17 @@ public class CaptureActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE){
-            if (resultCode == RESULT_OK){
+        if (requestCode == REQUEST_IMAGE_CAPTURE) {
+            if (resultCode == RESULT_OK) {
                 File tempFile = new File(Utility.getAgricxImagesFolderName(), AppConstants.TEMP_IMAGE_NAME);
-                if (!tempFile.exists()){
+                if (!tempFile.exists()) {
                     UiUtility.showTaskFailedDialog(thisActivity, R.string.temp_image_file_not_found);
                     return;
                 }
                 capturedImageUri = Uri.fromFile(tempFile);
                 try {
                     capturedImageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), capturedImageUri);
-                    if (capturedImageBitmap != null){
+                    if (capturedImageBitmap != null) {
                         ivPreview.setVisibility(View.VISIBLE);
                         bRetake.setVisibility(View.VISIBLE);
                         ivPreview.setImageBitmap(capturedImageBitmap);
@@ -434,7 +441,7 @@ public class CaptureActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         DialogFragment dialogFragment = (DialogFragment) getSupportFragmentManager().findFragmentByTag(AppConstants.DIALOG_FRAGMENT_TAG);
-        if(dialogFragment!=null &&  dialogFragment.getDialog()!=null && dialogFragment.getDialog().isShowing()) {
+        if (dialogFragment != null && dialogFragment.getDialog() != null && dialogFragment.getDialog().isShowing()) {
             dialogFragment.getDialog().dismiss();
         } else {
             (new AlertDialog.Builder(thisActivity))
@@ -454,7 +461,7 @@ public class CaptureActivity extends AppCompatActivity {
         }
     }
 
-    private void saveDetails(){
+    private void saveDetails() {
         LastEnteredInfo lastEnteredInfo = new LastEnteredInfo();
         lastEnteredInfo.setLotId(etLotId.getText().toString().trim());
         lastEnteredInfo.setSampleId(Long.parseLong(etSampleId.getText().toString().trim()));
@@ -462,9 +469,9 @@ public class CaptureActivity extends AppCompatActivity {
         PreferenceStorage.saveLastEnteredInfo(thisActivity, lastEnteredInfo);
     }
 
-    private void fillLastSavedDetails(){
+    private void fillLastSavedDetails() {
         LastEnteredInfo lastEnteredInfo = PreferenceStorage.getLastEnteredInfo(thisActivity);
-        if (lastEnteredInfo != null){
+        if (lastEnteredInfo != null) {
             etLotId.setText(lastEnteredInfo.getLotId());
             etSampleId.setText(String.valueOf(lastEnteredInfo.getSampleId()));
             tvImageId.setText(String.valueOf(lastEnteredInfo.getImageId()));

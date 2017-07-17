@@ -4939,7 +4939,6 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Log.e("TILT", String.valueOf(inclination));
         return inclination;
     }
 

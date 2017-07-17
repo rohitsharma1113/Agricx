@@ -31,6 +31,7 @@ import android.hardware.SensorManager;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.CamcorderProfile;
+import android.media.ExifInterface;
 import android.media.SoundPool;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -70,8 +71,11 @@ import com.agricx.app.agricximagecapture.camera.CameraController.CameraControlle
 import com.agricx.app.agricximagecapture.camera.CameraController.CameraControllerManager2;
 import com.agricx.app.agricximagecapture.camera.Preview.Preview;
 import com.agricx.app.agricximagecapture.camera.UI.MainUI;
+import com.agricx.app.agricximagecapture.utility.AppConstants;
 import com.agricx.app.agricximagecapture.utility.MyDebug;
 import com.agricx.app.agricximagecapture.utility.ToastBoxer;
+import com.agricx.app.agricximagecapture.utility.UiUtility;
+import com.agricx.app.agricximagecapture.utility.Utility;
 
 import java.io.File;
 import java.io.IOException;
@@ -1540,8 +1544,58 @@ public class MainActivity extends Activity {
     }
 
     public void clickedAcceptPhoto(View view) {
-		setResult(RESULT_OK, new Intent());
-		finish();
+		File tempFile = new File(Utility.getAgricxImagesFolderName(), AppConstants.TEMP_IMAGE_NAME);
+		if (!tempFile.exists()) {
+			UiUtility.showTaskFailedDialog(this, R.string.temp_image_file_not_found);
+			return;
+		}
+		Uri capturedImageUri = Uri.fromFile(tempFile);
+		try {
+			Bitmap capturedImageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), capturedImageUri);
+			if (capturedImageBitmap != null) {
+				int orientation = getCameraPhotoOrientation(getApplicationContext(), capturedImageUri, tempFile.getPath());
+				if (orientation == ExifInterface.ORIENTATION_NORMAL) {
+					setResult(RESULT_OK, new Intent());
+					finish();
+				} else {
+					getPreview().showToast(null, R.string.please_capture_in_landscape);
+				}
+			} else {
+				getPreview().showToast(null, R.string.could_not_capture);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			getPreview().showToast(null, R.string.could_not_capture);
+		}
+	}
+
+	public int getCameraPhotoOrientation(Context context, Uri imageUri, String imagePath){
+		int orientation = 0;
+		try {
+			context.getContentResolver().notifyChange(imageUri, null);
+			File imageFile = new File(imagePath);
+
+			ExifInterface exif = new ExifInterface(imageFile.getAbsolutePath());
+			orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+			/*
+			switch (orientation) {
+				case ExifInterface.ORIENTATION_ROTATE_270:
+					rotate = 270;
+					break;
+				case ExifInterface.ORIENTATION_ROTATE_180:
+					rotate = 180;
+					break;
+				case ExifInterface.ORIENTATION_ROTATE_90:
+					rotate = 90;
+					break;
+			}
+			*/
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return orientation;
 	}
 
     private final boolean test_panorama = false;
