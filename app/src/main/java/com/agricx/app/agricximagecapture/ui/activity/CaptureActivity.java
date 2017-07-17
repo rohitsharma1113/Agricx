@@ -32,6 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.agricx.app.agricximagecapture.R;
+import com.agricx.app.agricximagecapture.camera.MainActivity;
 import com.agricx.app.agricximagecapture.data.PreferenceStorage;
 import com.agricx.app.agricximagecapture.pojo.ImageCollectionLog;
 import com.agricx.app.agricximagecapture.pojo.LastEnteredInfo;
@@ -142,7 +143,9 @@ public class CaptureActivity extends AppCompatActivity {
         int id = view.getId();
         switch (id){
             case R.id.act_capture_b_camera:
-                dispatchTakePictureIntent();
+                startActivityForResult(new Intent(getApplicationContext(), MainActivity.class), REQUEST_IMAGE_CAPTURE);
+//                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+//                dispatchTakePictureIntent();
                 return;
             case R.id.act_capture_b_save_next:
                 saveImageToSdCard();
