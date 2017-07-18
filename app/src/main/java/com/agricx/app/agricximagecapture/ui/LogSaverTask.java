@@ -24,17 +24,19 @@ public class LogSaverTask extends AsyncTask<Void, Void, Boolean> {
     private Context context;
     private LogSaveDoneListener logSaveDoneListener;
     private File imageFile;
+    private String logFileName;
 
-    public LogSaverTask(Context context, ImageCollectionLog log, File imageFile, LogSaveDoneListener logSaveDoneListener){
+    public LogSaverTask(Context context, ImageCollectionLog log, String logFileName, File imageFile, LogSaveDoneListener logSaveDoneListener){
         this.context = context;
         this.log = log;
         this.logSaveDoneListener = logSaveDoneListener;
         this.imageFile = imageFile;
+        this.logFileName = logFileName;
     }
 
     @Override
     protected Boolean doInBackground(Void... voids) {
-        boolean saveStatus = FileStorage.saveCompleteImageCollectionLog(context, log);
+        boolean saveStatus = FileStorage.saveCompleteImageCollectionLog(context, log, logFileName);
         if (saveStatus){
             Utility.performFileScan(context, imageFile.toString());
         }

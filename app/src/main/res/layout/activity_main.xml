@@ -130,6 +130,7 @@
         android:contentDescription="@string/action_settings"
         android:src="@drawable/settings"
         android:onClick="clickedSettings"
+        android:visibility="gone"
         />
 
     <ImageButton

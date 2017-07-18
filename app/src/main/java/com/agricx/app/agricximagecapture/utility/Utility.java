@@ -4,6 +4,7 @@ import android.content.Context;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
 
@@ -19,10 +20,6 @@ import java.util.Comparator;
 
 import static android.content.Context.TELEPHONY_SERVICE;
 
-/**
- * Created by rohit on 17/4/17.
- */
-
 public class Utility {
 
     public static boolean isExternalStorageWritable() {
@@ -34,7 +31,7 @@ public class Utility {
     }
 
     @Nullable
-    public static LotInfo getLotInfoFromLotId(String lotId, ImageCollectionLog completeImageCollectionLog){
+    public static LotInfo getLotInfoFromLotId(String lotId, @NonNull ImageCollectionLog completeImageCollectionLog){
         for (LotInfo lotInfo: completeImageCollectionLog.getLotInfoList()){
             if (lotInfo.getLotId().equalsIgnoreCase(lotId)){
                 return lotInfo;
@@ -44,7 +41,7 @@ public class Utility {
     }
 
     @Nullable
-    public static SampleInfo getSampleInfoFromSampleId(long sampleId, ArrayList<SampleInfo> sampleInfoList){
+    public static SampleInfo getSampleInfoFromSampleId(long sampleId, @NonNull ArrayList<SampleInfo> sampleInfoList){
         for (SampleInfo sampleInfo: sampleInfoList){
             if (sampleInfo.getSampleId() == sampleId) {
                 return sampleInfo;

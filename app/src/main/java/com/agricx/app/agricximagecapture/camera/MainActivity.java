@@ -315,6 +315,9 @@ public class MainActivity extends Activity {
 			Log.d(TAG, "onCreate: time after setting immersive mode listener: " + (System.currentTimeMillis() - debug_time));
 
 		// show "about" dialog for first time use; also set some per-device defaults
+
+		// Block First time pop up
+		/*
 		boolean has_done_first_time = sharedPreferences.contains(PreferenceKeys.getFirstTimePreferenceKey());
 		if( MyDebug.LOG )
 			Log.d(TAG, "has_done_first_time: " + has_done_first_time);
@@ -340,6 +343,7 @@ public class MainActivity extends Activity {
 
             setFirstTimeFlag();
         }
+        */
 
 		setModeFromIntents(savedInstanceState);
 
@@ -1758,8 +1762,8 @@ public class MainActivity extends Activity {
 				Log.d(TAG, "has_zoom? " + preview.supportsZoom());
 		    ZoomControls zoomControls = (ZoomControls) findViewById(R.id.zoom);
 		    SeekBar zoomSeekBar = (SeekBar) findViewById(R.id.zoom_seekbar);
-
-			if( preview.supportsZoom() ) {
+			boolean supportsZoom = false; // preview.supportsZoom()
+			if( supportsZoom ) {
 				if( sharedPreferences.getBoolean(PreferenceKeys.getShowZoomControlsPreferenceKey(), false) ) {
 				    zoomControls.setIsZoomInEnabled(true);
 			        zoomControls.setIsZoomOutEnabled(true);

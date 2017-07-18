@@ -178,7 +178,7 @@ public class MyApplicationInterface implements ApplicationInterface {
     public boolean useCamera2() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         if (main_activity.supportsCamera2()) {
-            return sharedPreferences.getBoolean(PreferenceKeys.getUseCamera2PreferenceKey(), false);
+            return sharedPreferences.getBoolean(PreferenceKeys.getUseCamera2PreferenceKey(), true);
         }
         return false;
     }
@@ -510,13 +510,13 @@ public class MyApplicationInterface implements ApplicationInterface {
     @Override
     public boolean getPausePreviewPref() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        return sharedPreferences.getBoolean(PreferenceKeys.getPausePreviewPreferenceKey(), false);
+        return sharedPreferences.getBoolean(PreferenceKeys.getPausePreviewPreferenceKey(), true);
     }
 
     @Override
     public boolean getShowToastsPref() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        return sharedPreferences.getBoolean(PreferenceKeys.getShowToastsPreferenceKey(), true);
+        return sharedPreferences.getBoolean(PreferenceKeys.getShowToastsPreferenceKey(), false);
     }
 
     public boolean getThumbnailAnimationPref() {

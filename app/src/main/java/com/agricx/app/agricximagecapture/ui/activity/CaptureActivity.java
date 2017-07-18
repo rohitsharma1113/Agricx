@@ -13,12 +13,15 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
+import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -26,15 +29,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.agricx.app.agricximagecapture.R;
 import com.agricx.app.agricximagecapture.camera.MainActivity;
-import com.agricx.app.agricximagecapture.data.PreferenceStorage;
+import com.agricx.app.agricximagecapture.data.FileStorage;
 import com.agricx.app.agricximagecapture.pojo.ImageCollectionLog;
-import com.agricx.app.agricximagecapture.pojo.LastEnteredInfo;
 import com.agricx.app.agricximagecapture.pojo.LotInfo;
 import com.agricx.app.agricximagecapture.pojo.SampleInfo;
 import com.agricx.app.agricximagecapture.ui.LogReaderTask;
@@ -77,20 +80,42 @@ public class CaptureActivity extends AppCompatActivity {
     ProgressBar progressBar;
     @BindView(R.id.act_capture_b_retake)
     ImageButton bRetake;
+    @BindView(R.id.act_capture_tv_recertify_indicator)
+    TextView tvRecertifyIndicator;
 
     private Bitmap capturedImageBitmap;
     private Uri capturedImageUri;
     private LotInfo enteredLotInfo;
     private SampleInfo enteredSampleInfo;
-    private ImageCollectionLog imageCollectionLog;
+    private ImageCollectionLog originalLog;
+    private ImageCollectionLog recertifiedLog;
     private Activity thisActivity;
     private Animation scaleUpAnimation;
+    private boolean isRecertify;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupInitialView();
+        updateLogs();
         checkPermissions();
+    }
+
+    private void updateLogs() {
+        UiUtility.showProgressBarAndDisableTouch(progressBar, getWindow());
+        new LogReaderTask(getApplicationContext(), FileStorage.FILE_IMAGE_COLLECTION_LOG, new LogReaderTask.LogReadDoneListener() {
+            @Override
+            public void onLogReadDone(ImageCollectionLog log) {
+                originalLog = log;
+                new LogReaderTask(getApplicationContext(), FileStorage.FILE_IMAGE_COLLECTION_LOG_RECERTIFIED, new LogReaderTask.LogReadDoneListener() {
+                    @Override
+                    public void onLogReadDone(ImageCollectionLog log) {
+                        UiUtility.hideProgressBarAndEnableTouch(progressBar, getWindow());
+                        recertifiedLog = log;
+                    }
+                }).execute();
+            }
+        }).execute();
     }
 
     private void checkPermissions() {
@@ -135,6 +160,7 @@ public class CaptureActivity extends AppCompatActivity {
         progressBar.setVisibility(View.GONE);
         ivPreview.setVisibility(View.GONE);
         bRetake.setVisibility(View.GONE);
+        tvRecertifyIndicator.setVisibility(View.GONE);
         scaleUpAnimation = AnimationUtils.loadAnimation(this, R.anim.scale_up_anim);
     }
 
@@ -155,7 +181,7 @@ public class CaptureActivity extends AppCompatActivity {
 //                dispatchTakePictureIntent();
                 return;
             case R.id.act_capture_b_save_next:
-                saveImageToSdCard();
+                saveImageToSdCardAndSaveLogFile();
                 return;
             case R.id.act_capture_b_enter_lot_id:
                 fillAppropriateSampleAndImageId();
@@ -188,34 +214,40 @@ public class CaptureActivity extends AppCompatActivity {
             return;
         }
 
-        UiUtility.showProgressBarAndDisableTouch(progressBar, getWindow());
-        (new LogReaderTask(getApplicationContext(), new LogReaderTask.LogReadDoneListener() {
-            @Override
-            public void onLogReadDone(ImageCollectionLog log) {
-                UiUtility.hideProgressBarAndEnableTouch(progressBar, getWindow());
-                imageCollectionLog = log;
-                if (imageCollectionLog == null) {
-                    enteredLotInfo = null;
+        if (originalLog == null) {
+            isRecertify = false;
+            enteredLotInfo = null;
+            enteredSampleInfo = null;
+            etSampleId.setText("1");
+            tvImageId.setText("1");
+            tvRecertifyIndicator.setVisibility(View.GONE);
+        } else {
+            if (recertifiedLog != null && (enteredLotInfo = Utility.getLotInfoFromLotId(lotId, recertifiedLog)) != null) {
+                isRecertify = true;
+                ArrayList<SampleInfo> sampleInfoList = enteredLotInfo.getSampleInfoList();
+                enteredSampleInfo = Collections.max(sampleInfoList);
+                etSampleId.setText(String.valueOf(enteredSampleInfo.getSampleId()));
+                ArrayList<Integer> imageIdList = enteredSampleInfo.getImageIdList();
+                tvImageId.setText(String.valueOf(Collections.max(imageIdList) + 1));
+                tvRecertifyIndicator.setVisibility(View.VISIBLE);
+            } else {
+                isRecertify = false;
+                enteredLotInfo = Utility.getLotInfoFromLotId(lotId, originalLog);
+                if (enteredLotInfo != null) {
+                    ArrayList<SampleInfo> sampleInfoList = enteredLotInfo.getSampleInfoList();
+                    enteredSampleInfo = Collections.max(sampleInfoList);
+                    etSampleId.setText(String.valueOf(enteredSampleInfo.getSampleId()));
+                    ArrayList<Integer> imageIdList = enteredSampleInfo.getImageIdList();
+                    tvImageId.setText(String.valueOf(Collections.max(imageIdList) + 1));
+                } else {
                     enteredSampleInfo = null;
                     etSampleId.setText("1");
                     tvImageId.setText("1");
-                } else {
-                    enteredLotInfo = Utility.getLotInfoFromLotId(lotId, imageCollectionLog);
-                    if (enteredLotInfo != null) {
-                        ArrayList<SampleInfo> sampleInfoList = enteredLotInfo.getSampleInfoList();
-                        enteredSampleInfo = Collections.max(sampleInfoList);
-                        etSampleId.setText(String.valueOf(enteredSampleInfo.getSampleId()));
-                        ArrayList<Integer> imageIdList = enteredSampleInfo.getImageIdList();
-                        tvImageId.setText(String.valueOf(Collections.max(imageIdList) + 1));
-                    } else {
-                        enteredSampleInfo = null;
-                        etSampleId.setText("1");
-                        tvImageId.setText("1");
-                    }
                 }
-                etSampleId.requestFocus();
+                tvRecertifyIndicator.setVisibility(View.GONE);
             }
-        })).execute();
+        }
+        etSampleId.requestFocus();
     }
 
     private void fillAppropriateImageId() {
@@ -229,35 +261,43 @@ public class CaptureActivity extends AppCompatActivity {
             return;
         }
 
-        UiUtility.showProgressBarAndDisableTouch(progressBar, getWindow());
-        (new LogReaderTask(getApplicationContext(), new LogReaderTask.LogReadDoneListener() {
-            @Override
-            public void onLogReadDone(ImageCollectionLog log) {
-                UiUtility.hideProgressBarAndEnableTouch(progressBar, getWindow());
-                imageCollectionLog = log;
-                if (imageCollectionLog == null) {
-                    enteredLotInfo = null;
-                    enteredSampleInfo = null;
-                    tvImageId.setText("1");
+        if (originalLog == null) {
+            isRecertify = false;
+            enteredLotInfo = null;
+            enteredSampleInfo = null;
+            tvImageId.setText("1");
+            tvRecertifyIndicator.setVisibility(View.GONE);
+        } else {
+            if (recertifiedLog != null && (enteredLotInfo = Utility.getLotInfoFromLotId(lotId, recertifiedLog)) != null) {
+                isRecertify = true;
+                ArrayList<SampleInfo> sampleInfoList = enteredLotInfo.getSampleInfoList();
+                enteredSampleInfo = Utility.getSampleInfoFromSampleId(Long.parseLong(sampleId), sampleInfoList);
+                if (enteredSampleInfo != null) {
+                    ArrayList<Integer> imageIdList = enteredSampleInfo.getImageIdList();
+                    tvImageId.setText(String.valueOf(Collections.max(imageIdList) + 1));
                 } else {
-                    enteredLotInfo = Utility.getLotInfoFromLotId(lotId, imageCollectionLog);
-                    if (enteredLotInfo != null) {
-                        ArrayList<SampleInfo> sampleInfoList = enteredLotInfo.getSampleInfoList();
-                        enteredSampleInfo = Utility.getSampleInfoFromSampleId(Long.parseLong(sampleId), sampleInfoList);
-                        if (enteredSampleInfo != null) {
-                            ArrayList<Integer> imageIdList = enteredSampleInfo.getImageIdList();
-                            tvImageId.setText(String.valueOf(Collections.max(imageIdList) + 1));
-                        } else {
-                            tvImageId.setText("1");
-                        }
+                    tvImageId.setText("1");
+                }
+                tvRecertifyIndicator.setVisibility(View.VISIBLE);
+            } else {
+                isRecertify = false;
+                enteredLotInfo = Utility.getLotInfoFromLotId(lotId, originalLog);
+                if (enteredLotInfo != null) {
+                    ArrayList<SampleInfo> sampleInfoList = enteredLotInfo.getSampleInfoList();
+                    enteredSampleInfo = Utility.getSampleInfoFromSampleId(Long.parseLong(sampleId), sampleInfoList);
+                    if (enteredSampleInfo != null) {
+                        ArrayList<Integer> imageIdList = enteredSampleInfo.getImageIdList();
+                        tvImageId.setText(String.valueOf(Collections.max(imageIdList) + 1));
                     } else {
-                        enteredSampleInfo = null;
                         tvImageId.setText("1");
                     }
+                } else {
+                    enteredSampleInfo = null;
+                    tvImageId.setText("1");
                 }
-                UiUtility.closeKeyboard(getApplicationContext(), etSampleId.getWindowToken());
+                tvRecertifyIndicator.setVisibility(View.GONE);
             }
-        })).execute();
+        }
     }
 
     private File createTempImageFile() throws IOException {
@@ -303,6 +343,7 @@ public class CaptureActivity extends AppCompatActivity {
         if (getCurrentFocus() == etLotId) {
             etSampleId.setText("");
             tvImageId.setText("");
+            tvRecertifyIndicator.setVisibility(View.GONE);
         }
     }
 
@@ -313,7 +354,7 @@ public class CaptureActivity extends AppCompatActivity {
         }
     }
 
-    private void saveImageToSdCard() {
+    private void saveImageToSdCardAndSaveLogFile() {
         String lotId = etLotId.getText().toString().trim();
         String sampleId = etSampleId.getText().toString().trim();
         final String imageId = tvImageId.getText().toString().trim();
@@ -331,13 +372,21 @@ public class CaptureActivity extends AppCompatActivity {
         } else {
             File myDir = Utility.getAgricxImagesFolderName();
             File tempPhotoFile = new File(myDir, AppConstants.TEMP_IMAGE_NAME);
-            String renamedPhotoName = (new StringBuilder()).append(lotId).append("_").append(sampleId).append("_")
-                    .append(imageId).append("_").append(Utility.getDeviceImei(thisActivity)).append(".jpg").toString();
+            String renamedPhotoName;
+            StringBuilder renamedPhotoNameBuilder = (new StringBuilder()).append(lotId).append("_").append(sampleId).append("_")
+                    .append(imageId).append("_").append(Utility.getDeviceImei(thisActivity));
+            if (!isRecertify) {
+                renamedPhotoName = renamedPhotoNameBuilder.append(".jpg").toString();
+            } else {
+                renamedPhotoName = renamedPhotoNameBuilder.append("_R").append(".jpg").toString();
+            }
             File finalPhotoFile = new File(myDir, renamedPhotoName);
             if (tempPhotoFile.renameTo(finalPhotoFile)) {
                 saveLotInfoToCollectionLogVariable();
                 UiUtility.showProgressBarAndDisableTouch(progressBar, getWindow());
-                (new LogSaverTask(getApplicationContext(), imageCollectionLog, finalPhotoFile, new LogSaverTask.LogSaveDoneListener() {
+                ImageCollectionLog saveLog = !isRecertify ? originalLog : recertifiedLog;
+                String logFileName = !isRecertify ? FileStorage.FILE_IMAGE_COLLECTION_LOG : FileStorage.FILE_IMAGE_COLLECTION_LOG_RECERTIFIED;
+                (new LogSaverTask(getApplicationContext(), saveLog, logFileName, finalPhotoFile, new LogSaverTask.LogSaveDoneListener() {
                     @Override
                     public void onLogSaveDone(Boolean saved) {
                         UiUtility.hideProgressBarAndEnableTouch(progressBar, getWindow());
@@ -370,23 +419,35 @@ public class CaptureActivity extends AppCompatActivity {
     }
 
     private void saveLotInfoToCollectionLogVariable() {
-        if (imageCollectionLog == null) {
-            imageCollectionLog = new ImageCollectionLog();
-
+        if (!isRecertify && originalLog == null) {
             enteredLotInfo = new LotInfo(etLotId.getText().toString().trim());
             enteredSampleInfo = new SampleInfo(Long.parseLong(etSampleId.getText().toString().trim()));
             enteredLotInfo.getSampleInfoList().add(enteredSampleInfo);
 
-            imageCollectionLog.getLotInfoList().add(enteredLotInfo);
+            originalLog = new ImageCollectionLog();
+            originalLog.getLotInfoList().add(enteredLotInfo);
+        } else if (isRecertify && recertifiedLog == null) {
+            enteredLotInfo = new LotInfo(etLotId.getText().toString().trim());
+            enteredSampleInfo = new SampleInfo(Long.parseLong(etSampleId.getText().toString().trim()));
+            enteredLotInfo.getSampleInfoList().add(enteredSampleInfo);
+
+            recertifiedLog = new ImageCollectionLog();
+            recertifiedLog.getLotInfoList().add(enteredLotInfo);
         } else {
             if (enteredLotInfo == null) {
                 enteredLotInfo = new LotInfo(etLotId.getText().toString().trim());
                 enteredSampleInfo = new SampleInfo(Long.parseLong(etSampleId.getText().toString().trim()));
                 enteredLotInfo.getSampleInfoList().add(enteredSampleInfo);
-                imageCollectionLog.getLotInfoList().add(enteredLotInfo);
+
+                if (!isRecertify) {
+                    originalLog.getLotInfoList().add(enteredLotInfo);
+                } else {
+                    recertifiedLog.getLotInfoList().add(enteredLotInfo);
+                }
             } else {
                 if (enteredSampleInfo == null) {
                     enteredSampleInfo = new SampleInfo(Long.parseLong(etSampleId.getText().toString().trim()));
+
                     enteredLotInfo.getSampleInfoList().add(enteredSampleInfo);
                 } else {
                     enteredSampleInfo.getImageIdList().add(Integer.valueOf(tvImageId.getText().toString().trim()));
@@ -440,6 +501,8 @@ public class CaptureActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
+        /*
         DialogFragment dialogFragment = (DialogFragment) getSupportFragmentManager().findFragmentByTag(AppConstants.DIALOG_FRAGMENT_TAG);
         if (dialogFragment != null && dialogFragment.getDialog() != null && dialogFragment.getDialog().isShowing()) {
             dialogFragment.getDialog().dismiss();
@@ -459,8 +522,73 @@ public class CaptureActivity extends AppCompatActivity {
                     .create()
                     .show();
         }
+        */
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_recreate_lot) {
+            getRectifyAlertDialog().show();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private AlertDialog getRectifyAlertDialog() {
+        final EditText input = new EditText(thisActivity);
+        input.setHint(R.string.enter_lot_id);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        input.setLayoutParams(lp);
+        AlertDialog dialog = (new AlertDialog.Builder(thisActivity))
+                .setView(input)
+                .setTitle(R.string.enter_lot_to_rectify)
+                .setCancelable(false)
+                .setPositiveButton(R.string.rectify, null)
+                .setNegativeButton(R.string.cancel, null)
+                .create();
+
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(final DialogInterface dialog) {
+                Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String inputLotId = input.getText().toString().trim();
+                        if (TextUtils.isEmpty(inputLotId)) {
+                            Toast.makeText(thisActivity, getString(R.string.lot_id_cannot_be_blank), Toast.LENGTH_SHORT).show();
+                        } else {
+                            if (originalLog == null || Utility.getLotInfoFromLotId(inputLotId, originalLog) == null) {
+                                Toast.makeText(thisActivity, getString(R.string.lot_id_does_not_exist), Toast.LENGTH_SHORT).show();
+                            } else if (recertifiedLog != null && Utility.getLotInfoFromLotId(inputLotId, recertifiedLog) != null) {
+                                Toast.makeText(thisActivity, getString(R.string.lot_id_under_rectification_already), Toast.LENGTH_SHORT).show();
+                            } else {
+                                isRecertify = true;
+                                enteredLotInfo = null;
+                                enteredSampleInfo = null;
+                                tvImageId.setText("1");
+                                tvRecertifyIndicator.setVisibility(View.VISIBLE);
+                                dialog.dismiss();
+                            }
+                        }
+                    }
+                });
+            }
+        });
+        return dialog;
+    }
+
+    /*
     private void saveDetails() {
         LastEnteredInfo lastEnteredInfo = new LastEnteredInfo();
         lastEnteredInfo.setLotId(etLotId.getText().toString().trim());
@@ -477,4 +605,5 @@ public class CaptureActivity extends AppCompatActivity {
             tvImageId.setText(String.valueOf(lastEnteredInfo.getImageId()));
         }
     }
+    */
 }

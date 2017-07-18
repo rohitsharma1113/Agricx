@@ -538,9 +538,9 @@ public class DrawPreview {
 	        // http://daniel-codes.blogspot.co.uk/2013/06/how-to-correctly-format-datetime.html
 	        // http://code.google.com/p/android/issues/detail?id=42104
 	        // also possibly related https://code.google.com/p/android/issues/detail?id=181201
-	        String current_time = dateFormatTimeInstance.format(calendar.getTime());
+//	        String current_time = dateFormatTimeInstance.format(calendar.getTime());
 	        //String current_time = DateUtils.formatDateTime(getContext(), c.getTimeInMillis(), DateUtils.FORMAT_SHOW_TIME);
-	        applicationInterface.drawTextWithBackground(canvas, p, current_time, Color.WHITE, Color.BLACK, location_x, location_y, MyApplicationInterface.Alignment.ALIGNMENT_TOP);
+//	        applicationInterface.drawTextWithBackground(canvas, p, current_time, Color.WHITE, Color.BLACK, location_x, location_y, MyApplicationInterface.Alignment.ALIGNMENT_TOP);
 
 			if( ui_rotation == 90 ) {
 				location_y -= diff_y;
@@ -550,7 +550,9 @@ public class DrawPreview {
 			}
 	    }
 
-		if( camera_controller != null && sharedPreferences.getBoolean(PreferenceKeys.getShowFreeMemoryPreferenceKey(), true) ) {
+	    boolean showFreeMemory = false;
+//	    boolean showFreeMemory = sharedPreferences.getBoolean(PreferenceKeys.getShowFreeMemoryPreferenceKey(), true);
+		if( camera_controller != null && showFreeMemory) {
 			long time_now = System.currentTimeMillis();
 			if( last_free_memory_time == 0 || time_now > last_free_memory_time + 10000 ) {
 				// don't call this too often, for UI performance
@@ -572,7 +574,9 @@ public class DrawPreview {
 			}
 		}
 
-		if( camera_controller != null && sharedPreferences.getBoolean(PreferenceKeys.getShowISOPreferenceKey(), true) ) {
+		boolean showISO = false;
+//		boolean showISO = sharedPreferences.getBoolean(PreferenceKeys.getShowISOPreferenceKey(), false);
+		if( camera_controller != null && showISO) {
 			String string = "";
 			if( camera_controller.captureResultHasIso() ) {
 				int iso = camera_controller.captureResultIso();

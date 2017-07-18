@@ -4501,7 +4501,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
                     Log.d(TAG, "onPictureTaken");
                 // n.b., this is automatically run in a different thread
                 if (tilt_angle > DrawPreview.ALLOWED_TILT) {
-                    showToast(null, "Please keep your phone straight");
+                    showToast(null, R.string.please_keep_phone_horizontal);
                     success = false;
                     return;
                 }
