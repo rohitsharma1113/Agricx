@@ -46,12 +46,17 @@
     <string name="please_capture_in_landscape">Please capture in landscape mode</string>
     <string name="please_keep_phone_horizontal">Please keep your phone horizontal</string>
 
-    <string name="enter_lot_to_rectify">Enter Lot ID to rectify</string>
+    <string name="enter_lot_to_rectify">Enter Lot ID to recertify</string>
     <string name="lot_id_cannot_be_blank">Lot ID cannot be blank</string>
     <string name="lot_id_does_not_exist">Lot ID does not exist</string>
     <string name="lot_id_under_rectification_already">Lot ID already under recertification</string>
     <string name="recertify">Recertify</string>
 
+    <string name="set_camera_angle_title">Set Camera Angle</string>
+    <string name="set_camera_angle_message">Set max allowed camera angle</string>
+    <string name="max_allowed_camera_angle">Max allowed camera angle</string>
+
+    <string name="angle_cannot_be_blank">Angle cannot be blank</string>
 
 
     <!--Camera options-->
@@ -461,4 +466,7 @@
 
     <string name="audio_listener_failed">Failed to initalise audio listening</string>
     <string name="failed_to_process_hdr">Failed to create HDR image</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

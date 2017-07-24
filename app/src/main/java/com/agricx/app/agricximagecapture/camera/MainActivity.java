@@ -71,6 +71,7 @@ import com.agricx.app.agricximagecapture.camera.CameraController.CameraControlle
 import com.agricx.app.agricximagecapture.camera.CameraController.CameraControllerManager2;
 import com.agricx.app.agricximagecapture.camera.Preview.Preview;
 import com.agricx.app.agricximagecapture.camera.UI.MainUI;
+import com.agricx.app.agricximagecapture.utility.AgricxPreferenceKeys;
 import com.agricx.app.agricximagecapture.utility.AppConstants;
 import com.agricx.app.agricximagecapture.utility.MyDebug;
 import com.agricx.app.agricximagecapture.utility.ToastBoxer;
@@ -136,6 +137,10 @@ public class MainActivity extends Activity {
 	public volatile boolean test_have_angle;
 	public volatile float test_angle;
 	public volatile String test_last_saved_image;
+
+	// Agricx Data
+	public String agricx_image_save_folder_name;
+	public String agricx_allowed_camera_angle;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -152,6 +157,8 @@ public class MainActivity extends Activity {
 
 
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+		agricx_image_save_folder_name = getIntent().getStringExtra(AppConstants.EXTRA_IMAGE_FOLDER_NAME);
+		agricx_allowed_camera_angle = sharedPreferences.getString(AgricxPreferenceKeys.PF_KEY_CAMERA_ANGLE, "15");
 
 		// determine whether we should support "auto stabilise" feature
 		// risk of running out of memory on lower end devices, due to manipulation of large bitmaps
@@ -1548,58 +1555,8 @@ public class MainActivity extends Activity {
     }
 
     public void clickedAcceptPhoto(View view) {
-		File tempFile = new File(Utility.getAgricxImagesFolderName(), AppConstants.TEMP_IMAGE_NAME);
-		if (!tempFile.exists()) {
-			UiUtility.showTaskFailedDialog(this, R.string.temp_image_file_not_found);
-			return;
-		}
-		Uri capturedImageUri = Uri.fromFile(tempFile);
-		try {
-			Bitmap capturedImageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), capturedImageUri);
-			if (capturedImageBitmap != null) {
-				int orientation = getCameraPhotoOrientation(getApplicationContext(), capturedImageUri, tempFile.getPath());
-				if (orientation == ExifInterface.ORIENTATION_NORMAL) {
-					setResult(RESULT_OK, new Intent());
-					finish();
-				} else {
-					getPreview().showToast(null, R.string.please_capture_in_landscape);
-				}
-			} else {
-				getPreview().showToast(null, R.string.could_not_capture);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			getPreview().showToast(null, R.string.could_not_capture);
-		}
-	}
-
-	public int getCameraPhotoOrientation(Context context, Uri imageUri, String imagePath){
-		int orientation = 0;
-		try {
-			context.getContentResolver().notifyChange(imageUri, null);
-			File imageFile = new File(imagePath);
-
-			ExifInterface exif = new ExifInterface(imageFile.getAbsolutePath());
-			orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-
-			/*
-			switch (orientation) {
-				case ExifInterface.ORIENTATION_ROTATE_270:
-					rotate = 270;
-					break;
-				case ExifInterface.ORIENTATION_ROTATE_180:
-					rotate = 180;
-					break;
-				case ExifInterface.ORIENTATION_ROTATE_90:
-					rotate = 90;
-					break;
-			}
-			*/
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return orientation;
+		setResult(RESULT_OK, new Intent());
+		finish();
 	}
 
     private final boolean test_panorama = false;

@@ -10,10 +10,6 @@ import com.agricx.app.agricximagecapture.utility.Utility;
 
 import java.io.File;
 
-/**
- * Created by rohit on 19/4/17.
- */
-
 public class LogSaverTask extends AsyncTask<Void, Void, Boolean> {
 
     public interface LogSaveDoneListener {

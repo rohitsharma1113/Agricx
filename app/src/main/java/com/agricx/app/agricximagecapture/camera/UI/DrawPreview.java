@@ -14,6 +14,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.BatteryManager;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Surface;
@@ -53,7 +54,6 @@ public class DrawPreview {
 	private final DateFormat dateFormatTimeInstance = DateFormat.getTimeInstance();
 
 	private final static double close_level_angle = 1.0f;
-	public final static int ALLOWED_TILT = 15;
 	private String angle_string; // cached for UI performance
 	private long last_angle_string_time;
 
@@ -835,10 +835,12 @@ public class DrawPreview {
                 p.setTextSize(14 * scale + 0.5f); // convert dps to pixels
                 int pixels_offset_x = 0;
                 p.setTextAlign(Paint.Align.CENTER);
-                if( Math.abs(tilt_angle) <= ALLOWED_TILT ) {
-                    color = getAngleHighlightColor();
+                if( Math.abs(tilt_angle) <= Double.valueOf(main_activity.agricx_allowed_camera_angle)) {
+                    color = ContextCompat.getColor(getContext(), R.color.correct_angle);
                     p.setUnderlineText(true);
-                }
+                } else {
+					color = ContextCompat.getColor(getContext(), R.color.incorrect_angle);
+				}
                 if( angle_string == null || System.currentTimeMillis() > this.last_angle_string_time + 500 ) {
                     // update cached string
 					/*if( MyDebug.LOG )

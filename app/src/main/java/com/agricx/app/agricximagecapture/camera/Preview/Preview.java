@@ -57,6 +57,7 @@ import com.agricx.app.agricximagecapture.camera.CameraController.CameraControlle
 import com.agricx.app.agricximagecapture.camera.CameraController.CameraControllerManager;
 import com.agricx.app.agricximagecapture.camera.CameraController.CameraControllerManager1;
 import com.agricx.app.agricximagecapture.camera.CameraController.CameraControllerManager2;
+import com.agricx.app.agricximagecapture.camera.MainActivity;
 import com.agricx.app.agricximagecapture.camera.Preview.CameraSurface.CameraSurface;
 import com.agricx.app.agricximagecapture.camera.Preview.CameraSurface.MySurfaceView;
 import com.agricx.app.agricximagecapture.camera.Preview.CameraSurface.MyTextureView;
@@ -4500,7 +4501,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
                 if (MyDebug.LOG)
                     Log.d(TAG, "onPictureTaken");
                 // n.b., this is automatically run in a different thread
-                if (tilt_angle > DrawPreview.ALLOWED_TILT) {
+                if (tilt_angle > Integer.valueOf(((MainActivity)getContext()).agricx_allowed_camera_angle)) {
                     showToast(null, R.string.please_keep_phone_horizontal);
                     success = false;
                     return;

@@ -8,15 +8,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
 
-import com.agricx.app.agricximagecapture.data.FileStorage;
 import com.agricx.app.agricximagecapture.pojo.ImageCollectionLog;
 import com.agricx.app.agricximagecapture.pojo.LotInfo;
 import com.agricx.app.agricximagecapture.pojo.SampleInfo;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 import static android.content.Context.TELEPHONY_SERVICE;
 
@@ -50,10 +47,12 @@ public class Utility {
         return null;
     }
 
-    public static File getAgricxImagesFolderName(){
+    // Sample Collection Images folder
+    public static File getAptAgricxFolderName(String subFolderName){
         return new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                AppConstants.ARICX_IMAGES_FOLDER_NAME);
+                subFolderName);
     }
+
 
     public static String getDeviceImei(Context context){
         TelephonyManager manager = (TelephonyManager) context.getSystemService(TELEPHONY_SERVICE);

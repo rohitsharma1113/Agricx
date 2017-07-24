@@ -10,4 +10,7 @@
 
     <color name="divider_color">#cccccc</color>
     <color name="seekbar_background">#40000000</color>
+
+    <color name="correct_angle">#14e715</color>
+    <color name="incorrect_angle">#ff0516</color>
 </resources>

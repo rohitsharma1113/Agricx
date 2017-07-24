@@ -10,9 +10,12 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -20,6 +23,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,6 +32,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -43,6 +49,9 @@ import com.agricx.app.agricximagecapture.pojo.SampleInfo;
 import com.agricx.app.agricximagecapture.ui.LogReaderTask;
 import com.agricx.app.agricximagecapture.ui.LogSaverTask;
 import com.agricx.app.agricximagecapture.ui.fragment.ImagePreviewFragment;
+import com.agricx.app.agricximagecapture.ui.fragment.RectifyLotFragment;
+import com.agricx.app.agricximagecapture.ui.fragment.SettingsFragment;
+import com.agricx.app.agricximagecapture.utility.AgricxPreferenceKeys;
 import com.agricx.app.agricximagecapture.utility.AppConstants;
 import com.agricx.app.agricximagecapture.utility.UiUtility;
 import com.agricx.app.agricximagecapture.utility.Utility;
@@ -57,12 +66,12 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 
-public class CaptureActivity extends AppCompatActivity {
+public class CaptureActivity extends BaseActivity implements RectifyLotFragment.RecertifyLotIdListener {
 
     private static final String TAG = CaptureActivity.class.getSimpleName();
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
-    public static final int REQUEST_PERMISSIONS_ALL = 100;
+    private static final String TAG_RECERTIFICATION_FRAGMENT = "tag_recertification";
 
     @BindView(R.id.act_capture_iv_preview)
     ImageView ivPreview;
@@ -82,6 +91,8 @@ public class CaptureActivity extends AppCompatActivity {
     ImageButton bRetake;
     @BindView(R.id.act_capture_tv_recertify_indicator)
     TextView tvRecertifyIndicator;
+    @BindView(R.id.container)
+    FrameLayout flContainer;
 
     private Bitmap capturedImageBitmap;
     private Uri capturedImageUri;
@@ -90,15 +101,13 @@ public class CaptureActivity extends AppCompatActivity {
     private ImageCollectionLog originalLog;
     private ImageCollectionLog recertifiedLog;
     private Activity thisActivity;
-    private Animation scaleUpAnimation;
     private boolean isRecertify;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupInitialView();
         updateLogs();
-        checkPermissions();
     }
 
     private void updateLogs() {
@@ -118,39 +127,6 @@ public class CaptureActivity extends AppCompatActivity {
         }).execute();
     }
 
-    private void checkPermissions() {
-        String[] PERMISSIONS = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE};
-        if (!hasPermissions(this, PERMISSIONS)) {
-            ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_PERMISSIONS_ALL);
-        }
-    }
-
-    public boolean hasPermissions(Context context, String... permissions) {
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
-            for (String permission : permissions) {
-                if (ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_PERMISSIONS_ALL) {
-            if (grantResults.length > 0) {
-                for (int i = 0; i < permissions.length; i++) {
-                    if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-                        finish();
-                    }
-                }
-            } else {
-                finish();
-            }
-        }
-    }
-
     private void setupInitialView() {
         setContentView(R.layout.activity_capture);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -161,7 +137,6 @@ public class CaptureActivity extends AppCompatActivity {
         ivPreview.setVisibility(View.GONE);
         bRetake.setVisibility(View.GONE);
         tvRecertifyIndicator.setVisibility(View.GONE);
-        scaleUpAnimation = AnimationUtils.loadAnimation(this, R.anim.scale_up_anim);
     }
 
     @OnClick({
@@ -176,9 +151,10 @@ public class CaptureActivity extends AppCompatActivity {
         int id = view.getId();
         switch (id) {
             case R.id.act_capture_b_camera:
-                startActivityForResult(new Intent(getApplicationContext(), MainActivity.class), REQUEST_IMAGE_CAPTURE);
-//                startActivity(new Intent(getApplicationContext(), MainActivity.class));
-//                dispatchTakePictureIntent();
+                // Starts Custom Camera Activity
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.putExtra(AppConstants.EXTRA_IMAGE_FOLDER_NAME, AppConstants.AGRICX_IMAGES_FOLDER_NAME);
+                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
                 return;
             case R.id.act_capture_b_save_next:
                 saveImageToSdCardAndSaveLogFile();
@@ -300,12 +276,15 @@ public class CaptureActivity extends AppCompatActivity {
         }
     }
 
+
+    // Now being created in the Camera Code
+    /*
     private File createTempImageFile() throws IOException {
         if (!Utility.isExternalStorageWritable()) {
             Toast.makeText(this, getString(R.string.external_storage_not_writable), Toast.LENGTH_SHORT).show();
             return null;
         }
-        File myDir = Utility.getAgricxImagesFolderName();
+        File myDir = Utility.getAptAgricxFolderName();
         if (!myDir.exists()) {
             if (!myDir.mkdirs()) {
                 UiUtility.showTaskFailedDialog(thisActivity, R.string.failed_directory_creation);
@@ -314,7 +293,11 @@ public class CaptureActivity extends AppCompatActivity {
         }
         return new File(myDir, AppConstants.TEMP_IMAGE_NAME);
     }
+    */
 
+
+    // Used when native camera is used
+    /*
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -337,6 +320,7 @@ public class CaptureActivity extends AppCompatActivity {
             Toast.makeText(this, getString(R.string.could_not_open_camera), Toast.LENGTH_SHORT).show();
         }
     }
+    */
 
     @OnTextChanged(value = R.id.act_capture_et_lot_id, callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     void onLotIdChanged() {
@@ -370,7 +354,7 @@ public class CaptureActivity extends AppCompatActivity {
         } else if (!Utility.isExternalStorageWritable()) {
             Toast.makeText(this, getString(R.string.external_storage_not_writable), Toast.LENGTH_SHORT).show();
         } else {
-            File myDir = Utility.getAgricxImagesFolderName();
+            File myDir = Utility.getAptAgricxFolderName(AppConstants.AGRICX_IMAGES_FOLDER_NAME);
             File tempPhotoFile = new File(myDir, AppConstants.TEMP_IMAGE_NAME);
             String renamedPhotoName;
             StringBuilder renamedPhotoNameBuilder = (new StringBuilder()).append(lotId).append("_").append(sampleId).append("_")
@@ -460,22 +444,16 @@ public class CaptureActivity extends AppCompatActivity {
         capturedImageUri = null;
         capturedImageBitmap = null;
         bOpenCamera.setVisibility(View.VISIBLE);
-        bOpenCamera.startAnimation(scaleUpAnimation);
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            UiUtility.hideAnim(ivPreview);
-            UiUtility.hideAnim(bRetake);
-        } else {
-            ivPreview.setVisibility(View.GONE);
-            bRetake.setVisibility(View.GONE);
-        }
+        ivPreview.setVisibility(View.GONE);
+        bRetake.setVisibility(View.GONE);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE) {
             if (resultCode == RESULT_OK) {
-                File tempFile = new File(Utility.getAgricxImagesFolderName(), AppConstants.TEMP_IMAGE_NAME);
+                File tempFile = new File(Utility.getAptAgricxFolderName(AppConstants.AGRICX_IMAGES_FOLDER_NAME), AppConstants.TEMP_IMAGE_NAME);
                 if (!tempFile.exists()) {
                     UiUtility.showTaskFailedDialog(thisActivity, R.string.temp_image_file_not_found);
                     return;
@@ -501,11 +479,11 @@ public class CaptureActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        /*
         DialogFragment dialogFragment = (DialogFragment) getSupportFragmentManager().findFragmentByTag(AppConstants.DIALOG_FRAGMENT_TAG);
         if (dialogFragment != null && dialogFragment.getDialog() != null && dialogFragment.getDialog().isShowing()) {
             dialogFragment.getDialog().dismiss();
+        } else if (getFragmentManager().getBackStackEntryCount() > 0) {
+            super.onBackPressed();
         } else {
             (new AlertDialog.Builder(thisActivity))
                     .setTitle(R.string.confirmation)
@@ -522,7 +500,6 @@ public class CaptureActivity extends AppCompatActivity {
                     .create()
                     .show();
         }
-        */
     }
 
     @Override
@@ -536,74 +513,44 @@ public class CaptureActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_recreate_lot) {
-            getRectifyAlertDialog().show();
+            new RectifyLotFragment().show(getSupportFragmentManager(), TAG_RECERTIFICATION_FRAGMENT);
             return true;
+        } else if (id == R.id.action_settings) {
+            if (getFragmentManager().getBackStackEntryCount() == 0) {
+                getFragmentManager().beginTransaction().addToBackStack("").add(R.id.container, new SettingsFragment()).commit();
+            }
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private AlertDialog getRectifyAlertDialog() {
-        final EditText input = new EditText(thisActivity);
-        input.setHint(R.string.enter_lot_id);
-        input.setInputType(InputType.TYPE_CLASS_NUMBER);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        input.setLayoutParams(lp);
-        AlertDialog dialog = (new AlertDialog.Builder(thisActivity))
-                .setView(input)
-                .setTitle(R.string.enter_lot_to_rectify)
-                .setCancelable(false)
-                .setPositiveButton(R.string.rectify, null)
-                .setNegativeButton(R.string.cancel, null)
-                .create();
-
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(final DialogInterface dialog) {
-                Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
-                button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        String inputLotId = input.getText().toString().trim();
-                        if (TextUtils.isEmpty(inputLotId)) {
-                            Toast.makeText(thisActivity, getString(R.string.lot_id_cannot_be_blank), Toast.LENGTH_SHORT).show();
-                        } else {
-                            if (originalLog == null || Utility.getLotInfoFromLotId(inputLotId, originalLog) == null) {
-                                Toast.makeText(thisActivity, getString(R.string.lot_id_does_not_exist), Toast.LENGTH_SHORT).show();
-                            } else if (recertifiedLog != null && Utility.getLotInfoFromLotId(inputLotId, recertifiedLog) != null) {
-                                Toast.makeText(thisActivity, getString(R.string.lot_id_under_rectification_already), Toast.LENGTH_SHORT).show();
-                            } else {
-                                isRecertify = true;
-                                enteredLotInfo = null;
-                                enteredSampleInfo = null;
-                                tvImageId.setText("1");
-                                tvRecertifyIndicator.setVisibility(View.VISIBLE);
-                                dialog.dismiss();
-                            }
-                        }
-                    }
-                });
+    @Override
+    public void onRecertificationLotIdEntered(String lotId) {
+        if (TextUtils.isEmpty(lotId)) {
+            Toast.makeText(thisActivity, getString(R.string.lot_id_cannot_be_blank), Toast.LENGTH_SHORT).show();
+        } else {
+            if (originalLog == null || Utility.getLotInfoFromLotId(lotId, originalLog) == null) {
+                Toast.makeText(thisActivity, getString(R.string.lot_id_does_not_exist), Toast.LENGTH_SHORT).show();
+            } else if (recertifiedLog != null && Utility.getLotInfoFromLotId(lotId, recertifiedLog) != null) {
+                Toast.makeText(thisActivity, getString(R.string.lot_id_under_rectification_already), Toast.LENGTH_SHORT).show();
+            } else {
+                isRecertify = true;
+                enteredLotInfo = null;
+                enteredSampleInfo = null;
+                etLotId.setText(lotId);
+                etSampleId.setText("1");
+                tvImageId.setText("1");
+                tvRecertifyIndicator.setVisibility(View.VISIBLE);
+                dismissDialogFragment(TAG_RECERTIFICATION_FRAGMENT);
             }
-        });
-        return dialog;
-    }
-
-    /*
-    private void saveDetails() {
-        LastEnteredInfo lastEnteredInfo = new LastEnteredInfo();
-        lastEnteredInfo.setLotId(etLotId.getText().toString().trim());
-        lastEnteredInfo.setSampleId(Long.parseLong(etSampleId.getText().toString().trim()));
-        lastEnteredInfo.setImageId(Long.parseLong(tvImageId.getText().toString().trim()));
-        PreferenceStorage.saveLastEnteredInfo(thisActivity, lastEnteredInfo);
-    }
-
-    private void fillLastSavedDetails() {
-        LastEnteredInfo lastEnteredInfo = PreferenceStorage.getLastEnteredInfo(thisActivity);
-        if (lastEnteredInfo != null) {
-            etLotId.setText(lastEnteredInfo.getLotId());
-            etSampleId.setText(String.valueOf(lastEnteredInfo.getSampleId()));
-            tvImageId.setText(String.valueOf(lastEnteredInfo.getImageId()));
         }
     }
-    */
+
+    private void dismissDialogFragment(String tag) {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
+        if (fragment != null) {
+            DialogFragment dialogFragment = (DialogFragment) fragment;
+            dialogFragment.dismiss();
+        }
+    }
 }

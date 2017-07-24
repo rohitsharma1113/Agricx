@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+        android:key="preference_max_camera_angle"
+        android:title="@string/max_allowed_camera_angle"
+        android:summary="15"
+        android:dialogTitle="@string/set_camera_angle_title"
+        android:inputType="number"
+        android:defaultValue="15"
+        />
+
+</PreferenceScreen>
