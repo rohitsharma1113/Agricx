@@ -4,10 +4,10 @@
     <EditTextPreference
         android:key="preference_max_camera_angle"
         android:title="@string/max_allowed_camera_angle"
-        android:summary="15"
+        android:summary="12"
         android:dialogTitle="@string/set_camera_angle_title"
         android:inputType="number"
-        android:defaultValue="15"
+        android:defaultValue="12"
         />
 
 </PreferenceScreen>

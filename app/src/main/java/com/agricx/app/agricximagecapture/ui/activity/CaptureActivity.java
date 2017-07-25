@@ -1,41 +1,25 @@
 package com.agricx.app.agricximagecapture.ui.activity;
 
-import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
 import android.text.TextUtils;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,13 +35,12 @@ import com.agricx.app.agricximagecapture.ui.LogSaverTask;
 import com.agricx.app.agricximagecapture.ui.fragment.ImagePreviewFragment;
 import com.agricx.app.agricximagecapture.ui.fragment.RectifyLotFragment;
 import com.agricx.app.agricximagecapture.ui.fragment.SettingsFragment;
-import com.agricx.app.agricximagecapture.utility.AgricxPreferenceKeys;
 import com.agricx.app.agricximagecapture.utility.AppConstants;
+import com.agricx.app.agricximagecapture.utility.ImageUtils;
 import com.agricx.app.agricximagecapture.utility.UiUtility;
 import com.agricx.app.agricximagecapture.utility.Utility;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -442,6 +425,7 @@ public class CaptureActivity extends BaseActivity implements RectifyLotFragment.
 
     private void prepareNewCapture() {
         capturedImageUri = null;
+        capturedImageBitmap.recycle();
         capturedImageBitmap = null;
         bOpenCamera.setVisibility(View.VISIBLE);
 
@@ -460,7 +444,7 @@ public class CaptureActivity extends BaseActivity implements RectifyLotFragment.
                 }
                 capturedImageUri = Uri.fromFile(tempFile);
                 try {
-                    capturedImageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), capturedImageUri);
+                    capturedImageBitmap = ImageUtils.decodeSampledBitmapFromUri(getApplicationContext(), capturedImageUri);
                     if (capturedImageBitmap != null) {
                         ivPreview.setVisibility(View.VISIBLE);
                         bRetake.setVisibility(View.VISIBLE);
@@ -469,7 +453,7 @@ public class CaptureActivity extends BaseActivity implements RectifyLotFragment.
                     } else {
                         UiUtility.showTaskFailedDialog(thisActivity, R.string.could_not_capture);
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     UiUtility.showTaskFailedDialog(thisActivity, R.string.could_not_capture);
                 }
