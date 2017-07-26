@@ -6,10 +6,6 @@ import android.os.AsyncTask;
 import com.agricx.app.agricximagecapture.data.FileStorage;
 import com.agricx.app.agricximagecapture.pojo.ImageCollectionLog;
 
-/**
- * Created by rohit on 19/4/17.
- */
-
 public class LogReaderTask extends AsyncTask<Void, Void, ImageCollectionLog> {
 
     public interface LogReadDoneListener {
@@ -18,15 +14,17 @@ public class LogReaderTask extends AsyncTask<Void, Void, ImageCollectionLog> {
 
     private Context context;
     private LogReadDoneListener logReadDoneListener;
+    private String fileName;
 
-    public LogReaderTask(Context context, LogReadDoneListener logReadDoneListener){
+    public LogReaderTask(Context context,String fileName, LogReadDoneListener logReadDoneListener){
         this.context = context;
         this.logReadDoneListener = logReadDoneListener;
+        this.fileName = fileName;
     }
 
     @Override
     protected ImageCollectionLog doInBackground(Void... voids) {
-        return FileStorage.getCompleteImageCollectionLog(context);
+        return FileStorage.getCompleteImageCollectionLog(context, fileName);
     }
 
     @Override

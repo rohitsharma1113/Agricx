@@ -2,36 +2,42 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/act_capture_sv"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:id="@+id/act_capture_sv"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.agricx.app.agricximagecapture.ui.activity.CaptureActivity"
-    tools:showIn="@layout/activity_capture">
+    tools:showIn="@layout/activity_capture"
+    >
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:id="@+id/container"
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:padding="@dimen/medium_padding">
+            android:padding="@dimen/medium_padding"
+            >
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/image_height">
+                android:layout_height="@dimen/image_height"
+                >
 
                 <ImageView
                     android:id="@+id/act_capture_iv_preview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_gravity="center"
                     android:clickable="true"
                     android:scaleType="fitCenter"
-                    android:layout_gravity="center"
-                    tools:src="@color/colorAccent"/>
+                    tools:src="@color/colorAccent"
+                    />
 
                 <Button
                     android:id="@+id/act_capture_b_camera"
@@ -39,41 +45,57 @@
                     android:layout_width="@dimen/capture_button_width"
                     android:layout_height="@dimen/capture_button_height"
                     android:layout_gravity="center"
-                    android:textAllCaps="false"
-                    android:paddingTop="@dimen/capture_button_padding"
                     android:drawableTop="@drawable/camera"
-                    android:text="@string/capture_image"/>
+                    android:paddingTop="@dimen/capture_button_padding"
+                    android:text="@string/capture_image"
+                    android:textAllCaps="false"
+                    />
 
                 <ImageButton
                     android:id="@+id/act_capture_b_retake"
                     android:layout_width="@dimen/retake_dimen"
                     android:layout_height="@dimen/retake_dimen"
+                    android:layout_gravity="right|top"
                     android:background="@android:color/transparent"
                     android:scaleType="fitCenter"
-                    android:layout_gravity="right|top"
-                    android:src="@drawable/retake"/>
+                    android:src="@drawable/retake"
+                    />
+
+                <TextView
+                    android:id="@+id/act_capture_tv_recertify_indicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/border"
+                    android:padding="2dp"
+                    android:text="@string/recertify"
+                    android:textColor="@color/button_negative_background"
+                    android:textStyle="bold"
+                    />
 
             </FrameLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/medium_margin"
                 android:orientation="horizontal"
-                android:layout_marginTop="@dimen/medium_margin">
+                >
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.85">
+                    android:layout_weight="0.85"
+                    >
 
                     <EditText
                         android:id="@+id/act_capture_et_lot_id"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:digits="@string/input_lot_id"
                         android:hint="@string/lot_id"
                         android:inputType="text|textNoSuggestions"
-                        android:digits="@string/input_lot_id"
-                        android:maxLength="@integer/max_len_lot_id"/>
+                        android:maxLength="@integer/max_len_lot_id"
+                        />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -82,31 +104,35 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="0.15"
-                    android:scaleType="fitCenter"
                     android:background="@android:color/transparent"
-                    android:src="@drawable/touch_selector"/>
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/touch_selector"
+                    />
 
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/very_small_margin"
                 android:orientation="horizontal"
-                android:layout_marginTop="@dimen/very_small_margin">
+                >
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.85">
+                    android:layout_weight="0.85"
+                    >
 
                     <EditText
                         android:id="@+id/act_capture_et_sample_id"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:digits="@string/input_sample_id"
                         android:hint="@string/sample_id"
                         android:inputType="number"
-                        android:digits="@string/input_sample_id"
-                        android:maxLength="@integer/max_len_sample_id"/>
+                        android:maxLength="@integer/max_len_sample_id"
+                        />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -115,9 +141,10 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="0.15"
-                    android:scaleType="fitCenter"
                     android:background="@android:color/transparent"
-                    android:src="@drawable/touch_selector"/>
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/touch_selector"
+                    />
 
             </LinearLayout>
 
@@ -125,10 +152,11 @@
                 style="@style/Base.TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textStyle="bold"
                 android:layout_marginTop="@dimen/small_to_medium_margin"
                 android:padding="@dimen/very_small_padding"
-                android:text="@string/image_id"/>
+                android:text="@string/image_id"
+                android:textStyle="bold"
+                />
 
 
             <TextView
@@ -140,7 +168,8 @@
                 android:layout_marginRight="@dimen/very_small_margin"
                 android:background="@drawable/border_tv"
                 android:padding="@dimen/small_margin"
-                tools:text="1234"/>
+                tools:text="1234"
+                />
 
             <Button
                 android:id="@+id/act_capture_b_save_next"
@@ -148,9 +177,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/medium_to_large_margin"
-                android:textStyle="bold"
                 android:background="@drawable/shape_button"
-                android:text="@string/save_and_next"/>
+                android:text="@string/save_and_next"
+                android:textStyle="bold"
+                />
 
         </LinearLayout>
 
@@ -158,7 +188,8 @@
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            />
 
     </FrameLayout>
 

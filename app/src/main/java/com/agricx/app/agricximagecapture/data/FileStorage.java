@@ -19,12 +19,13 @@ import java.io.OutputStreamWriter;
 
 public class FileStorage {
 
-    private static final String FILE_IMAGE_COLLECTION_LOG = "file_collection_log";
+    public static final String FILE_IMAGE_COLLECTION_LOG = "file_collection_log";
+    public static final String FILE_IMAGE_COLLECTION_LOG_RECERTIFIED = "file_collection_log_rectified";
 
-    public static boolean saveCompleteImageCollectionLog(Context context, ImageCollectionLog imageCollectionLog){
+    public static boolean saveCompleteImageCollectionLog(Context context, ImageCollectionLog imageCollectionLog, String fileName){
         String data = (new Gson()).toJson(imageCollectionLog);
         try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(FILE_IMAGE_COLLECTION_LOG, Context.MODE_PRIVATE));
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(fileName, Context.MODE_PRIVATE));
             outputStreamWriter.write(data);
             outputStreamWriter.close();
             return true;
@@ -35,9 +36,9 @@ public class FileStorage {
     }
 
     @Nullable
-    public static ImageCollectionLog getCompleteImageCollectionLog(Context context){
+    public static ImageCollectionLog getCompleteImageCollectionLog(Context context, String fileName){
         try {
-            FileInputStream fis = context.openFileInput(FILE_IMAGE_COLLECTION_LOG);
+            FileInputStream fis = context.openFileInput(fileName);
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader bufferedReader = new BufferedReader(isr);
             StringBuilder sb = new StringBuilder();

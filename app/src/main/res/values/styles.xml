@@ -18,7 +18,7 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="Button.Base" parent="Base.Widget.AppCompat.Button">
+    <style name="Button.Base" parent="Base.Widget.AppCompat.Button.Borderless">
         <item name="android:textColor">@android:color/white</item>
     </style>
 
@@ -32,6 +32,25 @@
 
     <style name="Button.Negative" parent="Button.Base">
         <item name="android:background">@color/button_negative_background</item>
+    </style>
+
+
+    <!--Camera Theme-->
+    <!--
+       Base application theme, dependent on API level. This theme is replaced
+       by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+   -->
+    <style name="CameraBaseTheme" parent="android:Theme.NoTitleBar.Fullscreen">
+        <!--
+            Theme customizations available in newer API levels can go in
+            res/values-vXX/styles.xml, while customizations related to
+            backward-compatibility can go here.
+        -->
+    </style>
+
+    <!-- Application theme. -->
+    <style name="CameraTheme" parent="CameraBaseTheme">
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
 </resources>

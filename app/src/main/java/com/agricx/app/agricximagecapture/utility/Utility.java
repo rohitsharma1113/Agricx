@@ -4,24 +4,18 @@ import android.content.Context;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.telephony.TelephonyManager;
 
-import com.agricx.app.agricximagecapture.data.FileStorage;
 import com.agricx.app.agricximagecapture.pojo.ImageCollectionLog;
 import com.agricx.app.agricximagecapture.pojo.LotInfo;
 import com.agricx.app.agricximagecapture.pojo.SampleInfo;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 import static android.content.Context.TELEPHONY_SERVICE;
-
-/**
- * Created by rohit on 17/4/17.
- */
 
 public class Utility {
 
@@ -34,7 +28,7 @@ public class Utility {
     }
 
     @Nullable
-    public static LotInfo getLotInfoFromLotId(String lotId, ImageCollectionLog completeImageCollectionLog){
+    public static LotInfo getLotInfoFromLotId(String lotId, @NonNull ImageCollectionLog completeImageCollectionLog){
         for (LotInfo lotInfo: completeImageCollectionLog.getLotInfoList()){
             if (lotInfo.getLotId().equalsIgnoreCase(lotId)){
                 return lotInfo;
@@ -44,7 +38,7 @@ public class Utility {
     }
 
     @Nullable
-    public static SampleInfo getSampleInfoFromSampleId(long sampleId, ArrayList<SampleInfo> sampleInfoList){
+    public static SampleInfo getSampleInfoFromSampleId(long sampleId, @NonNull ArrayList<SampleInfo> sampleInfoList){
         for (SampleInfo sampleInfo: sampleInfoList){
             if (sampleInfo.getSampleId() == sampleId) {
                 return sampleInfo;
@@ -53,10 +47,12 @@ public class Utility {
         return null;
     }
 
-    public static File getAgricxImagesFolderName(){
+    // Sample Collection Images folder
+    public static File getAptAgricxFolderName(String subFolderName){
         return new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                AppConstants.ARICX_IMAGES_FOLDER_NAME);
+                subFolderName);
     }
+
 
     public static String getDeviceImei(Context context){
         TelephonyManager manager = (TelephonyManager) context.getSystemService(TELEPHONY_SERVICE);
