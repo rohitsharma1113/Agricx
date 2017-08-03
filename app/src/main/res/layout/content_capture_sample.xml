@@ -7,8 +7,8 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.agricx.app.agricximagecapture.ui.activity.CaptureActivity"
-    tools:showIn="@layout/activity_capture"
+    tools:context="com.agricx.app.agricximagecapture.ui.activity.CaptureSampleActivity"
+    tools:showIn="@layout/activity_capture_sample"
     >
 
     <FrameLayout
@@ -24,55 +24,7 @@
             android:padding="@dimen/medium_padding"
             >
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/image_height"
-                >
-
-                <ImageView
-                    android:id="@+id/act_capture_iv_preview"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:clickable="true"
-                    android:scaleType="fitCenter"
-                    tools:src="@color/colorAccent"
-                    />
-
-                <Button
-                    android:id="@+id/act_capture_b_camera"
-                    style="@style/Button.Neutral"
-                    android:layout_width="@dimen/capture_button_width"
-                    android:layout_height="@dimen/capture_button_height"
-                    android:layout_gravity="center"
-                    android:drawableTop="@drawable/camera"
-                    android:paddingTop="@dimen/capture_button_padding"
-                    android:text="@string/capture_image"
-                    android:textAllCaps="false"
-                    />
-
-                <ImageButton
-                    android:id="@+id/act_capture_b_retake"
-                    android:layout_width="@dimen/retake_dimen"
-                    android:layout_height="@dimen/retake_dimen"
-                    android:layout_gravity="right|top"
-                    android:background="@android:color/transparent"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/retake"
-                    />
-
-                <TextView
-                    android:id="@+id/act_capture_tv_recertify_indicator"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/border"
-                    android:padding="2dp"
-                    android:text="@string/recertify"
-                    android:textColor="@color/button_negative_background"
-                    android:textStyle="bold"
-                    />
-
-            </FrameLayout>
+            <include layout="@layout/view_capture"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -88,7 +40,7 @@
                     >
 
                     <EditText
-                        android:id="@+id/act_capture_et_lot_id"
+                        android:id="@+id/act_sample_capture_et_lot_id"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:digits="@string/input_lot_id"
@@ -100,7 +52,7 @@
                 </android.support.design.widget.TextInputLayout>
 
                 <ImageButton
-                    android:id="@+id/act_capture_b_enter_lot_id"
+                    android:id="@+id/act_sample_capture_b_enter_lot_id"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="0.15"
@@ -125,7 +77,7 @@
                     >
 
                     <EditText
-                        android:id="@+id/act_capture_et_sample_id"
+                        android:id="@+id/act_capture_sample_et_sample_id"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:digits="@string/input_sample_id"
@@ -137,7 +89,7 @@
                 </android.support.design.widget.TextInputLayout>
 
                 <ImageButton
-                    android:id="@+id/act_capture_b_enter_sample_id"
+                    android:id="@+id/act_sample_capture_b_enter_sample_id"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="0.15"
@@ -160,7 +112,7 @@
 
 
             <TextView
-                android:id="@+id/act_capture_tv_image_id"
+                android:id="@+id/act_base_capture_tv_image_id"
                 style="@style/Base.TextAppearance.AppCompat.Headline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -172,7 +124,7 @@
                 />
 
             <Button
-                android:id="@+id/act_capture_b_save_next"
+                android:id="@+id/act_base_capture_b_save_next"
                 style="@style/Button.Positive"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -184,12 +136,7 @@
 
         </LinearLayout>
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            />
+        <include layout="@layout/view_progress"/>
 
     </FrameLayout>
 

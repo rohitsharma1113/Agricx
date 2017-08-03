@@ -4,16 +4,12 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 
-/**
- * Created by rohit on 18/4/17.
- */
-
 public class ImageCollectionLog {
 
     @SerializedName("collectionLog")
     private ArrayList<LotInfo> lotInfoList;
 
-    public ImageCollectionLog(){
+    public ImageCollectionLog() {
         this.lotInfoList = new ArrayList<>();
     }
 

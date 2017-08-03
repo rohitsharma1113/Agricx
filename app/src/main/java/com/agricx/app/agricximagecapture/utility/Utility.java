@@ -48,7 +48,7 @@ public class Utility {
     }
 
     // Sample Collection Images folder
-    public static File getAptAgricxFolderName(String subFolderName){
+    public static File getParentDirectory(String subFolderName){
         return new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
                 subFolderName);
     }

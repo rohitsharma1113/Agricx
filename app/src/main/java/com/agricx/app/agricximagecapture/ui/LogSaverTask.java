@@ -5,24 +5,24 @@ import android.os.AsyncTask;
 
 import com.agricx.app.agricximagecapture.data.FileStorage;
 import com.agricx.app.agricximagecapture.pojo.ImageCollectionLog;
-import com.agricx.app.agricximagecapture.utility.UiUtility;
 import com.agricx.app.agricximagecapture.utility.Utility;
+import com.google.gson.Gson;
 
 import java.io.File;
 
-public class LogSaverTask extends AsyncTask<Void, Void, Boolean> {
+public class LogSaverTask<T> extends AsyncTask<Void, Void, Boolean> {
 
     public interface LogSaveDoneListener {
         void onLogSaveDone(Boolean logSaved);
     }
 
-    private ImageCollectionLog log;
+    private T log;
     private Context context;
     private LogSaveDoneListener logSaveDoneListener;
     private File imageFile;
     private String logFileName;
 
-    public LogSaverTask(Context context, ImageCollectionLog log, String logFileName, File imageFile, LogSaveDoneListener logSaveDoneListener){
+    public LogSaverTask(Context context, T log, String logFileName, File imageFile, LogSaveDoneListener logSaveDoneListener){
         this.context = context;
         this.log = log;
         this.logSaveDoneListener = logSaveDoneListener;
@@ -32,7 +32,7 @@ public class LogSaverTask extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... voids) {
-        boolean saveStatus = FileStorage.saveCompleteImageCollectionLog(context, log, logFileName);
+        boolean saveStatus = FileStorage.saveStringDataToFile(context, logFileName, log);
         if (saveStatus){
             Utility.performFileScan(context, imageFile.toString());
         }

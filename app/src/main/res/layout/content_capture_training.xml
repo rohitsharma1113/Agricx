@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/act_capture_sv"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.agricx.app.agricximagecapture.ui.activity.CaptureTrainingActivity"
+    tools:showIn="@layout/activity_capture_training"
+    >
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/container"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="@dimen/medium_padding"
+            >
+
+            <include layout="@layout/view_capture"/>
+
+            <Button
+                android:id="@+id/act_train_b_select_defect"
+                style="@style/Button.Select"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/medium_margin"
+                android:text="@string/select_defect"
+                android:textSize="@dimen/large_text_size"
+                />
+
+            <Button
+                android:id="@+id/act_train_b_select_variety"
+                style="@style/Button.Select"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/medium_margin"
+                android:text="@string/select_variety"
+                android:textSize="@dimen/large_text_size"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/small_to_medium_margin"
+                android:orientation="horizontal"
+                >
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.85"
+                    >
+
+                    <EditText
+                        android:id="@+id/act_train_et_sample_id"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:digits="@string/input_sample_id"
+                        android:hint="@string/sample_id"
+                        android:inputType="number"
+                        android:maxLength="@integer/max_len_sample_id"
+                        />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <ImageButton
+                    android:id="@+id/act_train_b_enter_sample_id"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.15"
+                    android:background="@android:color/transparent"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/touch_selector"
+                    />
+
+            </LinearLayout>
+
+            <TextView
+                style="@style/Base.TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/small_margin"
+                android:padding="@dimen/very_small_padding"
+                android:text="@string/image_id"
+                android:textStyle="bold"
+                />
+
+
+            <TextView
+                android:id="@+id/act_base_capture_tv_image_id"
+                style="@style/Base.TextAppearance.AppCompat.Headline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/very_small_margin"
+                android:layout_marginRight="@dimen/very_small_margin"
+                android:background="@drawable/border_tv"
+                android:padding="@dimen/small_margin"
+                tools:text="1234"
+                />
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="@dimen/medium_margin"
+                android:id="@+id/act_train_rg_c_u">
+
+                <RadioButton
+                    style="@style/Base.Widget.AppCompat.CompoundButton.RadioButton"
+                    android:text="@string/controlled"
+                    android:checked="true"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/act_train_rb_controlled"/>
+
+                <RadioButton
+                    style="@style/Base.Widget.AppCompat.CompoundButton.RadioButton"
+                    android:text="@string/uncontrolled"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/act_train_rb_uncontrolled" />
+
+            </RadioGroup>
+
+            <Button
+                android:id="@+id/act_base_capture_b_save_next"
+                style="@style/Button.Positive"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/medium_margin"
+                android:background="@drawable/shape_button"
+                android:text="@string/save_and_next"
+                android:textStyle="bold"
+                />
+
+        </LinearLayout>
+
+        <include layout="@layout/view_progress"/>
+
+    </FrameLayout>
+
+</ScrollView>

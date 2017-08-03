@@ -2,10 +2,6 @@ package com.agricx.app.agricximagecapture.pojo;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * Created by rohit on 18/4/17.
- */
-
 public class LastEnteredInfo {
 
     @SerializedName("lotId")

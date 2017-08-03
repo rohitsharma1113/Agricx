@@ -10,4 +10,14 @@
         android:defaultValue="12"
         />
 
+    <EditTextPreference
+        android:key="preference_marker_type"
+        android:title="@string/marker_type"
+        android:summary="RS175"
+        android:dialogTitle="@string/enter_marker_type"
+        android:inputType="textCapCharacters|textNoSuggestions"
+        android:digits="qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM123456789"
+        android:defaultValue="RS175"
+        />
+
 </PreferenceScreen>

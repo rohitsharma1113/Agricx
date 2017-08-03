@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/image_height"
+    >
+
+    <ImageView
+        android:id="@+id/view_capture_iv_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:clickable="true"
+        android:scaleType="fitCenter"
+        tools:src="@color/colorAccent"
+        />
+
+    <Button
+        android:id="@+id/view_capture_b_camera"
+        style="@style/Button.Neutral"
+        android:layout_width="@dimen/capture_button_width"
+        android:layout_height="@dimen/capture_button_height"
+        android:layout_gravity="center"
+        android:drawableTop="@drawable/camera"
+        android:paddingTop="@dimen/capture_button_padding"
+        android:text="@string/capture_image"
+        android:textAllCaps="false"
+        />
+
+    <ImageButton
+        android:id="@+id/view_capture_b_retake"
+        android:layout_width="@dimen/retake_dimen"
+        android:layout_height="@dimen/retake_dimen"
+        android:layout_gravity="right|top"
+        android:background="@android:color/transparent"
+        android:scaleType="fitCenter"
+        android:src="@drawable/retake"
+        />
+
+    <TextView
+        android:id="@+id/view_capture_tv_recertify_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/border"
+        android:padding="2dp"
+        android:text="@string/recertify"
+        android:textColor="@color/button_negative_background"
+        android:textStyle="bold"
+        />
+
+</FrameLayout>

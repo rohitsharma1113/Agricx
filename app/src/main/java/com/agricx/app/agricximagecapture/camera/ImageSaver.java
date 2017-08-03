@@ -1996,7 +1996,7 @@ public class ImageSaver extends Thread {
 			Toast.makeText(main_activity, R.string.external_storage_not_writable, Toast.LENGTH_SHORT).show();
 			return null;
 		}
-		File myDir = Utility.getAptAgricxFolderName(main_activity.agricx_image_save_folder_name);
+		File myDir = Utility.getParentDirectory(main_activity.agricx_image_save_folder_name);
 		if (!myDir.exists()){
 			if (!myDir.mkdirs()){
 				UiUtility.showTaskFailedDialog(main_activity, R.string.failed_directory_creation);

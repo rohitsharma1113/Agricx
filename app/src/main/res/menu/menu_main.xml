@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.agricx.app.agricximagecapture.ui.activity.CaptureActivity"
+    tools:context="com.agricx.app.agricximagecapture.ui.activity.CaptureSampleActivity"
     >
     <item
         android:id="@+id/action_recreate_lot"
@@ -10,8 +10,20 @@
         app:showAsAction="never"
         />
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_capture_training"
         android:orderInCategory="101"
+        android:title="@string/action_training"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/action_capture_sampling"
+        android:orderInCategory="101"
+        android:title="@string/action_sampling"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="102"
         android:title="@string/action_settings"
         app:showAsAction="never"
         />

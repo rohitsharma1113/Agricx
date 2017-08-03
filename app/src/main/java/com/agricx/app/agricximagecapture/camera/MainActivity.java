@@ -158,7 +158,7 @@ public class MainActivity extends Activity {
 
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		agricx_image_save_folder_name = getIntent().getStringExtra(AppConstants.EXTRA_IMAGE_FOLDER_NAME);
-		agricx_allowed_camera_angle = sharedPreferences.getString(AgricxPreferenceKeys.PF_KEY_CAMERA_ANGLE, "15");
+		agricx_allowed_camera_angle = sharedPreferences.getString(AgricxPreferenceKeys.PF_KEY_CAMERA_ANGLE, AppConstants.DEFAULT_ALLOWED_CAMERA_ANGLE);
 
 		// determine whether we should support "auto stabilise" feature
 		// risk of running out of memory on lower end devices, due to manipulation of large bitmaps

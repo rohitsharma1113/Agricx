@@ -6,10 +6,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 
-/**
- * Created by rohit on 18/4/17.
- */
-
 public class SampleInfo implements Comparable<SampleInfo>{
 
     @SerializedName("sampleId")
